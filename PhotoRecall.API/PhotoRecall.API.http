@@ -1,0 +1,6 @@
+@PhotoRecall.API_HostAddress = http://localhost:5075
+
+GET {{PhotoRecall.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

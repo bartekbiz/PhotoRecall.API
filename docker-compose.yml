@@ -1,0 +1,6 @@
+﻿services:
+  photorecall.api:
+    image: photorecall.api
+    build:
+      context: .
+      dockerfile: PhotoRecall.API/Dockerfile
