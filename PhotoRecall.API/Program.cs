@@ -4,7 +4,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 #region Inject Services
 builder.Services.AddControllers();
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddScoped<IPredictionsService, PredictionsService>();
 
