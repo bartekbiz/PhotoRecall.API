@@ -1,8 +1,14 @@
-namespace PhotoRecall.API.Predictions;
+namespace Data.Dtos;
+
+public class YoloRunnerResultDto
+{
+    public YoloRunnerExecutionDto YoloRunnerExecution { get; set; }
+    public List<PredictionDto> Predictions { get; set; }
+}
 
 public class PredictionDto
 {
-    public string Name {get; set;}
+    public string Name { get; set; }
     public int Class { get; set; }
     public double Confidence { get; set; }
     public BoxDto? Box { get; set; }
