@@ -2,8 +2,9 @@ namespace Data.Dtos;
 
 public class YoloRunnerResultDto
 {
-    public YoloRunnerExecutionDto YoloRunnerExecution { get; set; }
-    public List<PredictionDto> Predictions { get; set; }
+    public YoloRunnerInfoDto YoloRunnerInfo { get; set; }
+    public List<PredictionDto>? Predictions { get; set; }
+    public List<string> Errors { get; set; }
 }
 
 public class PredictionDto
