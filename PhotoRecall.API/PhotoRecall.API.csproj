@@ -20,4 +20,9 @@
       </Content>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Data\Data.csproj" />
+      <ProjectReference Include="..\PredictionUtils\PredictionUtils.csproj" />
+    </ItemGroup>
+
 </Project>
