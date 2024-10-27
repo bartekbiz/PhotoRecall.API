@@ -1,3 +1,4 @@
+using Data;
 using PhotoRecall.API.Middleware;
 using PhotoRecall.API.Predictions;
 
@@ -11,6 +12,9 @@ builder.Services.AddScoped<ErrorHandlingMiddleware>();
 
 // Services
 builder.Services.AddScoped<IPredictionsService, PredictionsService>();
+
+// Configuration
+builder.Services.Configure<List<YoloRunnerConfig>>(builder.Configuration.GetSection("YoloRunners"));
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
