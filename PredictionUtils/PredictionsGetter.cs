@@ -31,8 +31,10 @@ public class PredictionsGetter
                 {
                     if (!modelsToRun.TryDequeue(out var model))
                         continue;
+
+                    var requestResult = await GetPredictions(address, model, cancellationToken);
                     
-                    var yoloPredictions = new YoloRunnerResultDto()
+                    var yoloRunnerResult = new YoloRunnerResultDto()
                     {
                         YoloRunnerInfo = new YoloRunnerInfoDto()
                         {
@@ -40,12 +42,13 @@ public class PredictionsGetter
                             Address = address,
                             Model = model
                         },
-                        Predictions = await GetPredictions(address, model, cancellationToken)
+                        Predictions = requestResult.Item1,
+                        ErrorMessage = requestResult.Item2
                     };
                 
                     lock (result)
                     {
-                        result.Add(yoloPredictions);
+                        result.Add(yoloRunnerResult);
                     }
                 }
             });
@@ -54,10 +57,11 @@ public class PredictionsGetter
         return result;
     }
 
-    private async Task<List<PredictionDto>?> GetPredictions(string address, string model, 
+    private async Task<(List<PredictionDto>?, string?)> GetPredictions(string address, string model, 
         CancellationToken cancellationToken)
     {
         List<PredictionDto>? result = null;
+        string? errorMessage = null;
         
         try
         {
@@ -65,20 +69,24 @@ public class PredictionsGetter
 
             var responseContent = await response.Content.ReadAsStringAsync(cancellationToken);
             
-            if (!response.IsSuccessStatusCode || responseContent == string.Empty)
+            if (!response.IsSuccessStatusCode)
             {
-                // Log
-                return [];
+                throw new Exception($"Request was not successful, status code: {response.StatusCode}");
+            }
+
+            if (responseContent == string.Empty)
+            {
+                throw new Exception($"Response content was empty, status code: {response.StatusCode}");
             }
 
             result = JsonConvert.DeserializeObject<List<PredictionDto>>(responseContent);
         }
         catch (Exception e)
         {
-            
+            errorMessage = e.Message;
         }
         
-        return result;
+        return (result, errorMessage);
     }
 
     private static Uri CreateRequestUri(string address, string model)
