@@ -12,6 +12,7 @@ var loggingConfig = new LoggingConfig();
 builder.Services.AddSingleton(loggingConfig);
 builder.Configuration.GetSection("Logging").Bind(loggingConfig);
 
+builder.Services.Configure<PathsConfig>(builder.Configuration.GetSection("Paths"));
 builder.Services.Configure<List<YoloRunnerConfig>>(builder.Configuration.GetSection("YoloRunners"));
 
 // Logging
@@ -38,8 +39,6 @@ builder.Services.AddScoped<ErrorHandlingMiddleware>();
 
 // Services
 builder.Services.AddScoped<IPredictionsService, PredictionsService>();
-
-
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
