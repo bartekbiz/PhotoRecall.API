@@ -11,7 +11,7 @@ public static class FileUtils
             throw new Exception("File is null!");
         }
         
-        var newFileName = $"{new Guid()}.{file.FileName.Split(".").ToList().Last()}";
+        var newFileName = $"{Guid.NewGuid()}.{file.FileName.Split(".").ToList().Last()}";
         
         var photosPath = Path.Combine(Directory.GetCurrentDirectory(), dir);
         if (!Directory.Exists(photosPath))
