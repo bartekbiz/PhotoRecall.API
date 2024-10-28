@@ -9,30 +9,27 @@ namespace PhotoRecall.API.Predictions;
 public class PredictionsController : ControllerBase
 {
     private readonly IPredictionsService _predictionsService;
-    private readonly IOptions<List<YoloRunnerConfig>> _yoloRunnersConfig;
 
-    public PredictionsController(IPredictionsService predictionsService, 
-        IOptions<List<YoloRunnerConfig>> yoloRunnersConfig)
+    public PredictionsController(IPredictionsService predictionsService)
     {
         _predictionsService = predictionsService;
-        _yoloRunnersConfig = yoloRunnersConfig;
     }
     
     [HttpPost]
     [Route("GetVotedPredictionsAsync")]
     public async Task<IActionResult> GetVotedPredictionsAsync()
     {
-        var listPredictionDto = await _predictionsService.GetVotedPredictionsAsync(_yoloRunnersConfig.Value);
+        var predictions = await _predictionsService.GetVotedPredictionsAsync();
         
-        return StatusCode(StatusCodes.Status200OK, listPredictionDto);
+        return StatusCode(StatusCodes.Status200OK, predictions);
     }
     
     [HttpPost]
     [Route("GetAllPredictionsAsync")]
     public async Task<IActionResult> GetAllPredictionsAsync()
     {
-        var listPredictionDto = await _predictionsService.GetAllPredictionsAsync(_yoloRunnersConfig.Value);
+        var yoloRunnerResults = await _predictionsService.GetAllPredictionsAsync();
         
-        return StatusCode(StatusCodes.Status200OK, listPredictionDto);
+        return StatusCode(StatusCodes.Status200OK, yoloRunnerResults);
     }
 }

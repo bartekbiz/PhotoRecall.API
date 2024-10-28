@@ -1,6 +1,17 @@
 ﻿services:
-  photorecall.api:
-    image: photorecall.api
-    build:
-      context: .
-      dockerfile: PhotoRecall.API/Dockerfile
+  # photorecall.api:
+  #   image: photorecall.api
+  #   container_name: photorecall-api
+  #   restart: unless-stopped
+  #   build:
+  #     context: .
+  #     dockerfile: PhotoRecall.API/Dockerfile
+  seq:
+    image: datalust/seq
+    container_name: photorecall-api-logger
+    restart: unless-stopped
+    environment:
+        - ACCEPT_EULA=Y
+    ports:
+        - 5341:80
+        
