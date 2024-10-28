@@ -2,15 +2,8 @@ using PhotoRecall.API.Exceptions;
 
 namespace PhotoRecall.API.Middleware;
 
-public class ErrorHandlingMiddleware : IMiddleware
+public class ErrorHandlingMiddleware(ILogger<ErrorHandlingMiddleware> logger) : IMiddleware
 {
-    private readonly ILogger<ErrorHandlingMiddleware> _logger;
-
-    public ErrorHandlingMiddleware(ILogger<ErrorHandlingMiddleware> logger)
-    {
-        _logger = logger;
-    }
-    
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
         try
@@ -31,7 +24,7 @@ public class ErrorHandlingMiddleware : IMiddleware
         }
         catch (Exception e)
         {
-            _logger.LogError(e, e.Message);
+            logger.LogError(e, e.Message);
 
             context.Response.StatusCode = 500;
             await context.Response.WriteAsync("Something went wrong :(");
@@ -40,7 +33,7 @@ public class ErrorHandlingMiddleware : IMiddleware
 
     private async Task HandleHttpException(HttpContext context, HttpExceptionBase e)
     {
-        _logger.LogError(e, $"Http exception was thrown: Status code: {e.StatusCode}, Message: {e.Message}");
+        logger.LogError(e, $"Http exception was thrown: Status code: {e.StatusCode}, Message: {e.Message}");
             
         context.Response.StatusCode = e.StatusCode;
         await context.Response.WriteAsync(e.Message);
