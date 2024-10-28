@@ -7,17 +7,11 @@ using Newtonsoft.Json;
 
 namespace Utils;
 
-public class PredictionsGetter
+public class PredictionsGetter(ILogger logger, List<YoloRunnerConfig> yoloRunnersConfig)
 {
-    private readonly ILogger _logger;
     private readonly HttpClient _client = new HttpClient();
-    
-    public PredictionsGetter(ILogger logger)
-    {
-        _logger = logger;
-    }
-    
-    public async Task<List<YoloRunnerResultDto>> RunYoloRunners(List<YoloRunnerConfig> yoloRunnersConfig)
+
+    public async Task<List<YoloRunnerResultDto>> RunYoloRunners(string photoUrl)
     {
         var result = new List<YoloRunnerResultDto>();
         
@@ -34,7 +28,8 @@ public class PredictionsGetter
                     if (!modelsToRun.TryDequeue(out var model))
                         continue;
 
-                    var requestResult = await GetPredictions(url, model, cancellationToken);
+                    var requestResult = 
+                        await GetPredictions(url, photoUrl, model, cancellationToken);
                     
                     var yoloRunnerResult = new YoloRunnerResultDto()
                     {
@@ -44,7 +39,7 @@ public class PredictionsGetter
                             Url = url,
                             Model = model
                         },
-                        Predictions = requestResult.Item1,
+                        Predictions = requestResult,
                     };
                 
                     lock (result)
@@ -58,45 +53,45 @@ public class PredictionsGetter
         return result;
     }
 
-    private async Task<(List<PredictionDto>?, string?)> GetPredictions(string url, string model, 
+    private async Task<List<PredictionDto>?> GetPredictions(string url, string photoUrl, string model,
         CancellationToken cancellationToken)
     {
         List<PredictionDto>? result = null;
-        string? errorMessage = null;
         
         try
         {
-            var response = await _client.GetAsync(CreateRequestUri(url, model), cancellationToken);
+            var uri = CreateRequestUri(url, photoUrl, model);
+            var response = await _client.GetAsync(uri, cancellationToken);
 
             var responseContent = await response.Content.ReadAsStringAsync(cancellationToken);
             
             if (!response.IsSuccessStatusCode)
             {
-                _logger.LogError($"Request to YoloRunner was not successful, url: {url}, model: {model}, info: {response}");
+                logger.LogError($"Request to YoloRunner was not successful, url: {url}, model: {model}, info: {response}");
             }
 
             if (responseContent == string.Empty)
             {
-                _logger.LogError($"Prediction data from YoloRunner was empty, url: {url}, model: {model}, info: {response}");
+                logger.LogError($"Prediction data from YoloRunner was empty, url: {url}, model: {model}, info: {response}");
             }
 
             result = JsonConvert.DeserializeObject<List<PredictionDto>>(responseContent);
         }
         catch (Exception e)
         {
-            _logger.LogError($"Request to YoloRunner was not successfull, info: {e}");
+            logger.LogError($"Request to YoloRunner was not successfull, info: {e}");
         }
         
-        return (result, errorMessage);
+        return result;
     }
 
-    private static Uri CreateRequestUri(string url, string model)
+    private static Uri CreateRequestUri(string url, string photoUrl, string model)
     {
         var uri = $"{url}/predict";
         
         var queryParams = new Dictionary<string, string?>
         {
-            { "photo_url", "https://ultralytics.com/images/bus.jpg" },
+            { "photo_url", photoUrl },
             { "model_name", model }
         };
 
