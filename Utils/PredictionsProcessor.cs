@@ -1,7 +1,7 @@
 ﻿using Data;
 using Data.Dtos;
 
-namespace PredictionUtils;
+namespace Utils;
 
 public static class PredictionsProcessor
 {

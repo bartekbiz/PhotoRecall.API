@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
-namespace PredictionUtils;
+namespace Utils;
 
 public class PredictionsGetter
 {
