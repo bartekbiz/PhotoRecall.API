@@ -7,3 +7,4 @@ riderModule.iml
 appsettings.*
 .DS_Store
 *.DotSettings.user
+wwwroot/
