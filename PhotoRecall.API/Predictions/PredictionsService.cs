@@ -7,6 +7,7 @@ namespace PhotoRecall.API.Predictions;
 
 public class PredictionsService : IPredictionsService
 {
+    private readonly ILogger<PredictionsService> _logger;
     private readonly List<YoloRunnerConfig> _yoloRunnersConfig;
     private readonly PathsConfig _pathsConfig;
     private readonly PredictionsGetter _predictionsGetter;
@@ -15,39 +16,40 @@ public class PredictionsService : IPredictionsService
         IOptions<List<YoloRunnerConfig>> yoloRunnersConfig,
         IOptions<PathsConfig> pathsConfig)
     {
+        _logger = logger;
         _yoloRunnersConfig = yoloRunnersConfig.Value;
         _pathsConfig = pathsConfig.Value;
         _predictionsGetter = new PredictionsGetter(logger, _yoloRunnersConfig);
     }
 
-    public async Task<List<PredictionDto>> GetVotedPredictionsAsync(IFormFile photo)
+    public async Task<List<PredictionDto>> GetVotedPredictionsAsync(HttpRequest request, IFormFile photo)
     {
         ValidateYoloRunnersConfig(_yoloRunnersConfig);
         
-        var pathToPhoto = await FileUtils.SaveFormFile(_pathsConfig.PhotosPath, photo);
+        var pathToPhoto = await FileUtils.SaveFile(_pathsConfig.PhotosPath, photo);
         
         var predictions = await _predictionsGetter
-            .RunYoloRunners("https://ultralytics.com/images/bus.jpg");
+            .RunYoloRunners("");
         
         FileUtils.DeleteFile(pathToPhoto);
         
         return PredictionsProcessor.MergeByVoting(predictions);
     }
     
-    public async Task<List<YoloRunnerResultDto>> GetAllPredictionsAsync(IFormFile photo)
+    public async Task<List<YoloRunnerResultDto>> GetAllPredictionsAsync(HttpRequest request, IFormFile photo)
     {
         ValidateYoloRunnersConfig(_yoloRunnersConfig);
-        
-        var pathToPhoto = await FileUtils.SaveFormFile(_pathsConfig.PhotosPath, photo);
+
+        var photoUri = await FileUtils.SaveAndHostFile(_pathsConfig.PhotosPath, request, photo);
         
         var predictions = await _predictionsGetter
-            .RunYoloRunners("https://ultralytics.com/images/bus.jpg");
+            .RunYoloRunners(photoUri);
         
-        FileUtils.DeleteFile(pathToPhoto);
+        //FileUtils.DeleteFile(pathToPhoto);
 
         return predictions;
     }
-
+    
     #region ValidateYoloRunnerConfig
 
     private void ValidateYoloRunnersConfig(List<YoloRunnerConfig> yoloRunnersConfig)

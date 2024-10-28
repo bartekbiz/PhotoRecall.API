@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Utils;
 
 namespace PhotoRecall.API.Predictions;
 
@@ -10,7 +11,8 @@ public class PredictionsController(IPredictionsService predictionsService) : Con
     [Route("GetVotedPredictionsAsync")]
     public async Task<IActionResult> GetVotedPredictionsAsync(IFormFile photo)
     {
-        var predictions = await predictionsService.GetVotedPredictionsAsync(photo);
+        var predictions = await predictionsService
+            .GetVotedPredictionsAsync(Request, photo);
         
         return StatusCode(StatusCodes.Status200OK, predictions);
     }
@@ -19,7 +21,8 @@ public class PredictionsController(IPredictionsService predictionsService) : Con
     [Route("GetAllPredictionsAsync")]
     public async Task<IActionResult> GetAllPredictionsAsync(IFormFile photo)
     {
-        var yoloRunnerResults = await predictionsService.GetAllPredictionsAsync(photo);
+        var yoloRunnerResults = await predictionsService
+            .GetAllPredictionsAsync(Request, photo);
         
         return StatusCode(StatusCodes.Status200OK, yoloRunnerResults);
     }
