@@ -24,14 +24,7 @@ public class PredictionsService : IPredictionsService
 
     public async Task<List<PredictionDto>> GetVotedPredictionsAsync(HttpRequest request, IFormFile photo)
     {
-        ValidateYoloRunnersConfig(_yoloRunnersConfig);
-        
-        var pathToPhoto = await FileUtils.SaveFile(_pathsConfig.PhotosPath, photo);
-        
-        var predictions = await _predictionsGetter
-            .RunYoloRunners("");
-        
-        FileUtils.DeleteFile(pathToPhoto);
+        var predictions = await GetAllPredictionsAsync(request, photo);
         
         return PredictionsProcessor.MergeByVoting(predictions);
     }
@@ -40,12 +33,15 @@ public class PredictionsService : IPredictionsService
     {
         ValidateYoloRunnersConfig(_yoloRunnersConfig);
 
-        var photoUri = await FileUtils.SaveAndHostFile(_pathsConfig.PhotosPath, request, photo);
+        var url = UriUtils.CreateUrl(request);
+        var hostedPhoto = await FileUtils.SaveAndHostFile(_pathsConfig.PhotosPath, url, photo);
+        
+        _logger.LogInformation(hostedPhoto.Uri);
         
         var predictions = await _predictionsGetter
-            .RunYoloRunners(photoUri);
+            .RunYoloRunners(hostedPhoto.Uri);
         
-        //FileUtils.DeleteFile(pathToPhoto);
+        //FileUtils.DeleteFile(hostedPhoto.Path);
 
         return predictions;
     }

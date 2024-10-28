@@ -6,13 +6,21 @@ public static class FileUtils
 {
     private const string StaticContentDir = "wwwroot";
 
-    public static async Task<string> SaveAndHostFile(string path, HttpRequest request, IFormFile file)
+    public struct HostedFile
+    {
+        public string Path { get; init; }
+        public string Uri { get; init; }
+    }
+    
+    public static async Task<HostedFile> SaveAndHostFile(string path, string url, IFormFile file)
     {
         var pathToFile = await SaveFile(GetAbsolutePath(path), file);
-
-        var relativePathToFile = GetRelativeToStaticContentPath(pathToFile);
         
-        return UriUtils.CreateUri(request, relativePathToFile);;
+        return new HostedFile
+        {
+            Path = pathToFile,
+            Uri = UriUtils.CreateUri(url, GetRelativeToStaticContentPath(pathToFile))
+        };
     }
     
     public static async Task<string> SaveFile(string path, IFormFile file)
