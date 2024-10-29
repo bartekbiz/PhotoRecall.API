@@ -1,11 +1,23 @@
-﻿services:
-  # photorecall.api:
-  #   image: photorecall.api
-  #   container_name: photorecall-api
-  #   restart: unless-stopped
-  #   build:
-  #     context: .
-  #     dockerfile: PhotoRecall.API/Dockerfile
+﻿networks:
+  photorecall-api-network:
+    name: photorecall-api-network
+
+volumes:
+  photorecall-api-logger-data:
+    name: photorecall-api-logger-data
+
+services:
+  photorecall-api:
+    image: photorecall-api
+    container_name: photorecall-api
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+        - 8080:8080
+    networks:
+        - photorecall-api-network
   seq:
     image: datalust/seq
     container_name: photorecall-api-logger
@@ -14,4 +26,8 @@
         - ACCEPT_EULA=Y
     ports:
         - 5341:80
-        
+    networks: 
+        - photorecall-api-network
+    volumes: 
+        - photorecall-api-logger-data:/data
+
