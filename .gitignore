@@ -10,4 +10,3 @@ appsettings.*
 *.DotSettings.user
 wwwroot/
 data/
-config/
