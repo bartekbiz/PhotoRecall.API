@@ -13,7 +13,7 @@ services:
     container_name: photorecall-api
     restart: unless-stopped
     ports:
-        - "5000:5000"
+        - "8080:8080"
     networks:
         - photorecall-backend
     volumes: 
