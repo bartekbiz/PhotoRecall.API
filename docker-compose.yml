@@ -13,7 +13,7 @@ services:
     container_name: photorecall-api
     restart: unless-stopped
     ports:
-        - 8080:8080
+        - "5000:5000"
     networks:
         - photorecall-backend
     volumes: 
@@ -27,7 +27,7 @@ services:
     environment:
         - ACCEPT_EULA=Y
     ports:
-        - 5341:80
+        - "5341:80"
     networks:
         - photorecall-backend
     volumes: 
