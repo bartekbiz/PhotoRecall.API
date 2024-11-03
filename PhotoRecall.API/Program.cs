@@ -4,10 +4,17 @@ using OpenTelemetry.Logs;
 using PhotoRecall.API.Middleware;
 using PhotoRecall.API.Predictions;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(new WebApplicationOptions
+{
+    Args = args,
+    ContentRootPath = AppContext.BaseDirectory,
+});
 
 #region Inject Services
-// Configuration
+builder.Configuration.Sources.Clear();
+builder.Configuration.AddJsonFile("config/appsettings.json", optional: false, reloadOnChange: true);
+builder.Configuration.AddEnvironmentVariables();
+
 var loggingConfig = new LoggingConfig();
 builder.Services.AddSingleton(loggingConfig);
 builder.Configuration.GetSection("Logging").Bind(loggingConfig);
