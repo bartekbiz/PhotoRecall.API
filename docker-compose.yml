@@ -1,23 +1,25 @@
 ﻿networks:
-  photorecall-api-network:
-    name: photorecall-api-network
+  photorecall-backend:
+    name: photorecall-backend
 
 volumes:
   photorecall-api-logger-data:
     name: photorecall-api-logger-data
 
 services:
+  # API
   photorecall-api:
     image: photorecall-api
     container_name: photorecall-api
     restart: unless-stopped
-    build:
-      context: .
-      dockerfile: Dockerfile
     ports:
         - 8080:8080
     networks:
-        - photorecall-api-network
+        - photorecall-backend
+    volumes: 
+        - ./config:/app/config
+  
+  # APIs logging tool
   seq:
     image: datalust/seq
     container_name: photorecall-api-logger
@@ -26,8 +28,29 @@ services:
         - ACCEPT_EULA=Y
     ports:
         - 5341:80
-    networks: 
-        - photorecall-api-network
+    networks:
+        - photorecall-backend
     volumes: 
         - photorecall-api-logger-data:/data
 
+  # YoloRunners
+  yolo_ultralytics_runner-1:
+    image: bartekbiz/yolo_ultralytics_runner:latest
+    container_name: yolo_ultralytics_runner-1
+    restart: unless-stopped
+    networks:
+        - photorecall-backend
+
+  yolo_ultralytics_runner-2:
+    image: bartekbiz/yolo_ultralytics_runner:latest
+    container_name: yolo_ultralytics_runner-2
+    restart: unless-stopped
+    networks:
+        - photorecall-backend
+
+  yolo_7_runner:
+    image: bartekbiz/yolo_7_runner:latest
+    container_name: yolo_7_runner
+    restart: unless-stopped
+    networks:
+        - photorecall-backend
