@@ -12,11 +12,13 @@ services:
     image: bartekbiz/photorecall-api:latest
     container_name: photorecall-api
     restart: unless-stopped
+    environment:
+        - ASPNETCORE_URLS=http://*:8080
     ports:
         - "8080:8080"
     networks:
         - photorecall-backend
-    volumes: 
+    volumes:
         - ./config:/app/config
   
   # APIs logging tool
