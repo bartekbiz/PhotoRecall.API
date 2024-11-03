@@ -9,7 +9,7 @@ volumes:
 services:
   # API
   photorecall-api:
-    image: photorecall-api
+    image: bartekbiz/photorecall-api:latest
     container_name: photorecall-api
     restart: unless-stopped
     ports:
