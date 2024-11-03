@@ -17,7 +17,7 @@ services:
     networks:
         - photorecall-backend
     volumes: 
-        - ./config:/app/Config
+        - ./config:/app/config
   
   # APIs logging tool
   seq:

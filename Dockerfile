@@ -20,8 +20,4 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 RUN mkdir -p wwwroot
-COPY appsettings.* /tmp/
-COPY entrypoint.sh /app/entrypoint.sh
-RUN chmod +x /app/entrypoint.sh
-ENTRYPOINT ["/app/entrypoint.sh"]
-CMD ["dotnet PhotoRecall.API.dll"]
+ENTRYPOINT ["dotnet", "PhotoRecall.API.dll"]
