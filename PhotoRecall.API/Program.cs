@@ -12,11 +12,11 @@ var builder = WebApplication.CreateBuilder(new WebApplicationOptions
 
 #region Inject Services
 // Configuration
-builder.Configuration.Sources.Clear();
 #if !DEBUG
+builder.Configuration.Sources.Clear();
 builder.Configuration.AddJsonFile("config/appsettings.json", optional: false, reloadOnChange: true);
-#endif
 builder.Configuration.AddEnvironmentVariables();
+#endif
 
 var loggingConfig = new LoggingConfig();
 builder.Services.AddSingleton(loggingConfig);
