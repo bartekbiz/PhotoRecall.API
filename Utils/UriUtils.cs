@@ -24,7 +24,7 @@ public static class UriUtils
 
     public static string CreateUri(string url, string path)
     {
-        return $"{url}/{path}".Replace("//", "/");
+        return url + ("/" + path).Replace("//", "/");
     }
     
     public static string CreateUri(HttpRequest request, string path)
