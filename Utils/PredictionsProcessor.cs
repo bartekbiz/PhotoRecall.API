@@ -3,24 +3,75 @@ using Data.Dtos;
 
 namespace Utils;
 
-public static class PredictionsProcessor
+public class PredictionsProcessor
 {
-    public static List<PredictionDto> MergeByVoting(List<YoloRunnerResultDto> predictions)
+    private struct MergedPredictionPerYoloRunner
     {
-        var result = new List<PredictionDto>();
-        
+        public YoloRunnerInfoDto YoloRunnerInfoDto { get; set; }
+        public List<MergedPrediction> MergedPredictions { get; set; }
+    }
+    
+    private struct MergedPrediction
+    {
+        public string Name { get; set; }
+        public int Count { get; set; }
+        public double Confidence { get; set; }
+    }
+    
+    public List<MergedPredictionDto> MergeByVoting(List<YoloRunnerResultDto> predictions)
+    {
         if (predictions.Count <= 0)
         {
-            return result;
-        } 
-        
-        var firstPrediction = predictions.First();
-        
-        // foreach (var yoloRunnerName in predictions.Keys.Take(new Range(1, Index.End)))
-        // {
-        //     
-        // }
+            return [];
+        }
 
-        return result;
+        var mergedPerYoloRunner = new List<MergedPredictionPerYoloRunner>();
+        
+        foreach (var yoloRunnerResult in predictions)
+        {
+            if (yoloRunnerResult.Predictions == null)
+                continue;
+
+            var merged = yoloRunnerResult.Predictions
+                .GroupBy(g => g.Name)
+                .Select(group => new MergedPrediction
+                {
+                    Name = group.Key, 
+                    Count = group.Count(), 
+                    Confidence = group.Sum(s => s.Confidence) / (double)group.Count()
+                })
+                .ToList();
+
+            mergedPerYoloRunner.Add(new MergedPredictionPerYoloRunner
+            {
+                YoloRunnerInfoDto = yoloRunnerResult.YoloRunnerInfo,
+                MergedPredictions = merged
+            });
+        }
+
+        return Vote(mergedPerYoloRunner);
+    }
+
+    private List<MergedPredictionDto> Vote(List<MergedPredictionPerYoloRunner> mergedPerYoloRunner)
+    {
+        var result = new List<MergedPredictionDto>();
+
+        var selected = mergedPerYoloRunner
+            .SelectMany(s => s.MergedPredictions)
+            .GroupBy(g => g.Name);
+
+        foreach (var group in selected)
+        {
+            result.Add(new MergedPredictionDto
+            {
+                Name = group.Key,
+                Count = (int)Math.Round(group
+                    .Select(s => (double)s.Count * s.Confidence).Sum() / mergedPerYoloRunner.Count)
+            });
+        }
+        
+        return result
+            .Where(w => w.Count != 0)
+            .ToList();
     }
 }
