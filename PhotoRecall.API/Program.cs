@@ -18,12 +18,13 @@ builder.Configuration.AddJsonFile("config/appsettings.json", optional: false, re
 builder.Configuration.AddEnvironmentVariables();
 #endif
 
+builder.Services.Configure<UrlsConfig>(builder.Configuration.GetSection("Urls"));
+builder.Services.Configure<PathsConfig>(builder.Configuration.GetSection("Paths"));
+builder.Services.Configure<List<YoloRunnerConfig>>(builder.Configuration.GetSection("YoloRunners"));
+
 var loggingConfig = new LoggingConfig();
 builder.Services.AddSingleton(loggingConfig);
 builder.Configuration.GetSection("Logging").Bind(loggingConfig);
-
-builder.Services.Configure<PathsConfig>(builder.Configuration.GetSection("Paths"));
-builder.Services.Configure<List<YoloRunnerConfig>>(builder.Configuration.GetSection("YoloRunners"));
 
 // Logging
 builder.Logging.ClearProviders();

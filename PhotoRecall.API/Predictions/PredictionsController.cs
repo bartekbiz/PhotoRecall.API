@@ -12,7 +12,7 @@ public class PredictionsController(IPredictionsService predictionsService) : Con
     public async Task<IActionResult> GetVotedPredictionsAsync(IFormFile photo)
     {
         var predictions = await predictionsService
-            .GetVotedPredictionsAsync(Request, photo);
+            .GetVotedPredictionsAsync(photo);
         
         return StatusCode(StatusCodes.Status200OK, predictions);
     }
@@ -22,7 +22,7 @@ public class PredictionsController(IPredictionsService predictionsService) : Con
     public async Task<IActionResult> GetAllPredictionsAsync(IFormFile photo)
     {
         var yoloRunnerResults = await predictionsService
-            .GetAllPredictionsAsync(Request, photo);
+            .GetAllPredictionsAsync(photo);
         
         return StatusCode(StatusCodes.Status200OK, yoloRunnerResults);
     }

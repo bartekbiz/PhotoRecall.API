@@ -10,31 +10,34 @@ public class PredictionsService : IPredictionsService
     private readonly ILogger<PredictionsService> _logger;
     private readonly List<YoloRunnerConfig> _yoloRunnersConfig;
     private readonly PathsConfig _pathsConfig;
+    private readonly UrlsConfig _urlsConfig;
     private readonly PredictionsGetter _predictionsGetter;
 
     public PredictionsService(ILogger<PredictionsService> logger,
         IOptions<List<YoloRunnerConfig>> yoloRunnersConfig,
-        IOptions<PathsConfig> pathsConfig)
+        IOptions<PathsConfig> pathsConfig,
+        IOptions<UrlsConfig> urlsConfig)
     {
         _logger = logger;
         _yoloRunnersConfig = yoloRunnersConfig.Value;
         _pathsConfig = pathsConfig.Value;
+        _urlsConfig = urlsConfig.Value;
         _predictionsGetter = new PredictionsGetter(logger, _yoloRunnersConfig);
     }
 
-    public async Task<List<PredictionDto>> GetVotedPredictionsAsync(HttpRequest request, IFormFile photo)
+    public async Task<List<PredictionDto>> GetVotedPredictionsAsync(IFormFile photo)
     {
-        var predictions = await GetAllPredictionsAsync(request, photo);
+        var predictions = await GetAllPredictionsAsync(photo);
         
         return PredictionsProcessor.MergeByVoting(predictions);
     }
     
-    public async Task<List<YoloRunnerResultDto>> GetAllPredictionsAsync(HttpRequest request, IFormFile photo)
+    public async Task<List<YoloRunnerResultDto>> GetAllPredictionsAsync(IFormFile photo)
     {
         ValidateYoloRunnersConfig(_yoloRunnersConfig);
-
-        var url = UriUtils.CreateUrl(request);
-        var hostedPhoto = await FileUtils.SaveAndHostFile(_pathsConfig.PhotosPath, url, photo);
+        
+        var hostedPhoto = await FileUtils
+            .SaveAndHostFile(_pathsConfig.PhotosPath, _urlsConfig.ContainerUrl, photo);
         
         _logger.LogInformation(hostedPhoto.Uri);
         
