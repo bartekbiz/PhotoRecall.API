@@ -2,20 +2,29 @@ namespace PhotoRecall.API.Exceptions;
 
 public class HttpExceptionBase(string message) : Exception(message)
 {
-    public int StatusCode { get; set; }
+    public int StatusCode { get; protected init; }
 }
 
-public class BadRequestException(string message) : HttpExceptionBase(message)
+public class BadRequestException : HttpExceptionBase
 {
-    public int StatusCode { get; set; } = 400;
+    public BadRequestException(string message) : base(message)
+    {
+        StatusCode = 400;
+    }
 }
 
-public class UnauthorizedException(string message) : HttpExceptionBase(message)
+public class UnauthorizedException : HttpExceptionBase
 {
-    public int StatusCode { get; set; } = 401;
+    public UnauthorizedException(string message) : base(message)
+    {
+        StatusCode = 401;
+    }
 }
 
-public class NotFoundException(string message) : HttpExceptionBase(message)
+public class NotFoundException : HttpExceptionBase
 {
-    public int StatusCode { get; set; } = 404;
+    public NotFoundException(string message) : base(message)
+    {
+        StatusCode = 404;
+    }
 }
