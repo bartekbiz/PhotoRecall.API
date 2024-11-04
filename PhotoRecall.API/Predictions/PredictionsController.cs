@@ -8,11 +8,11 @@ namespace PhotoRecall.API.Predictions;
 public class PredictionsController(IPredictionsService predictionsService) : ControllerBase
 {
     [HttpPost]
-    [Route("GetVotedPredictionsAsync")]
-    public async Task<IActionResult> GetVotedPredictionsAsync(IFormFile photo)
+    [Route("GetVotedPredictionsWithCountAsync")]
+    public async Task<IActionResult> GetVotedPredictionsWithCountAsync(IFormFile photo)
     {
         var predictions = await predictionsService
-            .GetVotedPredictionsAsync(photo);
+            .GetVotedPredictionsWithCountAsync(photo);
         
         return StatusCode(StatusCodes.Status200OK, predictions);
     }
