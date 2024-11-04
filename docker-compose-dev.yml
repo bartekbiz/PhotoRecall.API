@@ -10,11 +10,8 @@ volumes:
 services:
   # API
   photorecall-api:
-    image: photorecall.api
+    image: bartekbiz/photorecall-api:dev
     container_name: photorecall-api
-    build:
-      context: .
-      dockerfile: Dockerfile
     restart: unless-stopped
     environment:
         - ASPNETCORE_URLS=http://*:8080
@@ -23,7 +20,7 @@ services:
     networks:
         - photorecall-backend
     volumes:
-        - ./config:/app/config
+        - /home/user/engeneer/Develop/config:/app/config
   
   # APIs logging tool
   seq:
