@@ -9,4 +9,3 @@ appsettings.*
 .DS_Store
 *.DotSettings.user
 wwwroot/
-data/
