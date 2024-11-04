@@ -2,6 +2,7 @@ using Data;
 using Data.Dtos;
 using Microsoft.Extensions.Options;
 using Utils;
+using Utils.PredictionsMergers;
 
 namespace PhotoRecall.API.Predictions;
 
@@ -25,13 +26,12 @@ public class PredictionsService : IPredictionsService
         _predictionsGetter = new PredictionsGetter(logger, _yoloRunnersConfig);
     }
 
-    public async Task<List<MergedPredictionDto>> GetVotedPredictionsAsync(IFormFile photo)
+    public async Task<List<PredictionWithCountDto>> GetVotedPredictionsWithCountAsync(IFormFile photo)
     {
         var predictions = await GetAllPredictionsAsync(photo);
 
-        var predictionsProcessor = new PredictionsProcessor();
-        
-        return predictionsProcessor.MergeByVoting(predictions);
+        var predictionsMerger = new PredictionsMergerWithCounts(predictions);
+        return predictionsMerger.Merge();
     }
     
     public async Task<List<YoloRunnerResultDto>> GetAllPredictionsAsync(IFormFile photo)
@@ -41,12 +41,10 @@ public class PredictionsService : IPredictionsService
         var hostedPhoto = await FileUtils
             .SaveAndHostFile(_pathsConfig.PhotosPath, _urlsConfig.ContainerUrl, photo);
         
-        _logger.LogInformation(hostedPhoto.Uri);
-        
         var predictions = await _predictionsGetter
             .RunYoloRunners(hostedPhoto.Uri);
         
-        //FileUtils.DeleteFile(hostedPhoto.Path);
+        FileUtils.DeleteFile(hostedPhoto.Path);
 
         return predictions;
     }
