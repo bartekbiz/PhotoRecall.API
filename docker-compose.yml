@@ -5,6 +5,7 @@
 volumes:
   photorecall-api-logger-data:
     name: photorecall-api-logger-data
+    external: true
 
 services:
   # API
