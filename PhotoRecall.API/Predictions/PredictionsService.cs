@@ -25,11 +25,13 @@ public class PredictionsService : IPredictionsService
         _predictionsGetter = new PredictionsGetter(logger, _yoloRunnersConfig);
     }
 
-    public async Task<List<PredictionDto>> GetVotedPredictionsAsync(IFormFile photo)
+    public async Task<List<MergedPredictionDto>> GetVotedPredictionsAsync(IFormFile photo)
     {
         var predictions = await GetAllPredictionsAsync(photo);
+
+        var predictionsProcessor = new PredictionsProcessor();
         
-        return PredictionsProcessor.MergeByVoting(predictions);
+        return predictionsProcessor.MergeByVoting(predictions);
     }
     
     public async Task<List<YoloRunnerResultDto>> GetAllPredictionsAsync(IFormFile photo)
