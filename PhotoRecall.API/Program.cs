@@ -21,7 +21,7 @@ builder.Configuration.AddEnvironmentVariables();
 #endif
 
 builder.Services.Configure<UrlsConfig>(builder.Configuration.GetSection("Urls"));
-builder.Services.Configure<PathsConfig>(builder.Configuration.GetSection("Paths"));
+builder.Services.Configure<PhotosConfig>(builder.Configuration.GetSection("Photos"));
 builder.Services.Configure<List<YoloRunnerConfig>>(builder.Configuration.GetSection("YoloRunners"));
 
 var loggingConfig = new LoggingConfig();
