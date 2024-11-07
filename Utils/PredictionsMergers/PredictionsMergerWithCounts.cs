@@ -23,6 +23,8 @@ public class PredictionsMergerWithCounts : PredictionsMerger<PredictionWithCount
 
     #endregion
 
+    #region Merge
+
     public override List<PredictionWithCountDto> Merge()
     {
         if (_predictions.Count <= 0)
@@ -59,6 +61,10 @@ public class PredictionsMergerWithCounts : PredictionsMerger<PredictionWithCount
         }
     }
 
+    #endregion
+    
+    #region Vote
+
     private List<PredictionWithCountDto> Vote()
     {
         var groupsByName = _mergedPerYoloRunner
@@ -84,4 +90,6 @@ public class PredictionsMergerWithCounts : PredictionsMerger<PredictionWithCount
             .Select(s => s.Count)
             .Sum() / yoloRunnerCount);
     }
+
+    #endregion
 }

@@ -42,7 +42,7 @@ public class PredictionsService : IPredictionsService
             .SaveAndHostFile(_pathsConfig.PhotosPath, _urlsConfig.ContainerUrl, photo);
         
         var predictions = await _predictionsGetter
-            .RunYoloRunners(hostedPhoto.Uri);
+            .GetPredictions(hostedPhoto.Uri);
         
         FileUtils.DeleteFile(hostedPhoto.Path);
 
