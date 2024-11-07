@@ -1,6 +1,8 @@
 using Data;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Logs;
+using PhotoRecall.API.Administration;
+using PhotoRecall.API.Info;
 using PhotoRecall.API.Middleware;
 using PhotoRecall.API.Predictions;
 
@@ -50,6 +52,8 @@ builder.Services.AddScoped<ErrorHandlingMiddleware>();
 
 // Services
 builder.Services.AddScoped<IPredictionsService, PredictionsService>();
+builder.Services.AddScoped<IInfoService, InfoService>();
+builder.Services.AddScoped<IAdministratorService, AdministratorService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
