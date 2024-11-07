@@ -11,13 +11,13 @@ public class PredictionsGetter(ILogger logger, List<YoloRunnerConfig> yoloRunner
 {
     private readonly HttpClient _client = new HttpClient();
 
-    public async Task<List<YoloRunnerResultDto>> GetPredictions(string photoUrl)
+    public async Task<List<YoloRunnerResultDto>> GetPredictions(string photoUrl, List<string> yoloModels)
     {
         var result = new List<YoloRunnerResultDto>();
         
         await Parallel.ForEachAsync(yoloRunnersConfig, async (yoloRunner, cancellationToken) =>
         {
-            var modelsToRun = new ConcurrentQueue<string>(yoloRunner.Models);
+            var modelsToRun = new ConcurrentQueue<string>(yoloRunner.Models.Where(yoloModels.Contains));
             
             await Parallel.ForEachAsync(yoloRunner.Urls, cancellationToken, async (url, token) =>
             {
