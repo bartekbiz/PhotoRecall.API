@@ -1,6 +1,9 @@
 using Data;
 using Data.Dtos;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using PhotoRecall.API.Exceptions;
+using PhotoRecall.API.Info;
 using Utils;
 using Utils.PredictionsMergers;
 
@@ -9,44 +12,25 @@ namespace PhotoRecall.API.Predictions;
 public class PredictionsService : IPredictionsService
 {
     private readonly ILogger<PredictionsService> _logger;
+    private readonly IInfoService _infoService;
     private readonly List<YoloRunnerConfig> _yoloRunnersConfig;
-    private readonly PathsConfig _pathsConfig;
+    private readonly PhotosConfig _photosConfig;
     private readonly UrlsConfig _urlsConfig;
     private readonly PredictionsGetter _predictionsGetter;
 
     public PredictionsService(ILogger<PredictionsService> logger,
+        IInfoService infoService,
         IOptions<List<YoloRunnerConfig>> yoloRunnersConfig,
-        IOptions<PathsConfig> pathsConfig,
+        IOptions<PhotosConfig> photosConfig,
         IOptions<UrlsConfig> urlsConfig)
     {
         _logger = logger;
+        _infoService = infoService;
         _yoloRunnersConfig = yoloRunnersConfig.Value;
-        _pathsConfig = pathsConfig.Value;
+        ValidateYoloRunnersConfig(_yoloRunnersConfig);
+        _photosConfig = photosConfig.Value;
         _urlsConfig = urlsConfig.Value;
         _predictionsGetter = new PredictionsGetter(logger, _yoloRunnersConfig);
-    }
-
-    public async Task<List<PredictionWithCountDto>> GetVotedPredictionsWithCountAsync(IFormFile photo)
-    {
-        var predictions = await GetAllPredictionsAsync(photo);
-
-        var predictionsMerger = new PredictionsMergerWithCounts(predictions);
-        return predictionsMerger.Merge();
-    }
-    
-    public async Task<List<YoloRunnerResultDto>> GetAllPredictionsAsync(IFormFile photo)
-    {
-        ValidateYoloRunnersConfig(_yoloRunnersConfig);
-        
-        var hostedPhoto = await FileUtils
-            .SaveAndHostFile(_pathsConfig.PhotosPath, _urlsConfig.ContainerUrl, photo);
-        
-        var predictions = await _predictionsGetter
-            .RunYoloRunners(hostedPhoto.Uri);
-        
-        FileUtils.DeleteFile(hostedPhoto.Path);
-
-        return predictions;
     }
     
     #region ValidateYoloRunnerConfig
@@ -66,6 +50,69 @@ public class PredictionsService : IPredictionsService
         if (yoloRunnersConfig.Any(a => a.Models?.Count == 0))
         {
             throw new Exception("One or more YoloRunners have invalid models configuration.");
+        }
+    }
+
+    #endregion
+    
+    public async Task<List<YoloRunnerResultDto>> GetAllPredictionsAsync(IFormFile photo)
+    {
+        var modelsList = _infoService.GetAvailableYoloModelsAsync();
+        ValidatePhoto(photo);
+        
+        return await GetPredictionsAsync(photo, modelsList);
+    }
+    
+    public async Task<List<PredictionWithCountDto>> GetVotedPredictionsWithCountAsync(PredictionPropsDto propsDto)
+    {
+        var predictions = await GetPredictionsAsync(propsDto);
+
+        var predictionsMerger = new PredictionsMergerWithCounts(predictions);
+        return predictionsMerger.Merge();
+    }
+
+    public async Task<List<YoloRunnerResultDto>> GetPredictionsAsync(PredictionPropsDto propsDto)
+    {
+        var modelsList = string.IsNullOrEmpty(propsDto.YoloModels) ? 
+            _infoService.GetAvailableYoloModelsAsync() : 
+            OtherUtils.ConvertJsonStringToList(propsDto.YoloModels);
+        
+        ValidateProps(propsDto.Photo, modelsList);
+
+        return await GetPredictionsAsync(propsDto.Photo, modelsList!);
+    }
+
+    private async Task<List<YoloRunnerResultDto>> GetPredictionsAsync(IFormFile photo, List<string> modelsList)
+    {
+        var hostedPhoto = await FileUtils
+            .SaveAndHostFile(_photosConfig.Path, _urlsConfig.ContainerUrl, photo);
+
+        var predictions = await _predictionsGetter
+            .GetPredictions(hostedPhoto.Uri, modelsList);
+
+        FileUtils.DeleteFile(hostedPhoto.Path);
+
+        return predictions;
+    }
+
+    #region ValidateProps
+
+    private void ValidateProps(IFormFile photo, List<string>? modelsList)
+    {
+        ValidatePhoto(photo);
+        
+        if (modelsList == null || modelsList.Count == 0)
+        {
+            throw new BadRequestException("YoloModels should be passed as a valid json string.");
+        }
+    }
+
+    private void ValidatePhoto(IFormFile photo)
+    {
+        var fileExtension = photo.FileName.Split(".").Last();
+        if (!_photosConfig.AcceptedTypes.Contains(fileExtension))
+        {
+            throw new BadRequestException($"File type \".{fileExtension}\" is not supported.");
         }
     }
 

@@ -5,6 +5,7 @@ namespace PhotoRecall.API.Predictions;
 
 public interface IPredictionsService
 {
-    Task<List<PredictionWithCountDto>> GetVotedPredictionsWithCountAsync(IFormFile photo);
     Task<List<YoloRunnerResultDto>> GetAllPredictionsAsync(IFormFile photo);
+    Task<List<YoloRunnerResultDto>> GetPredictionsAsync(PredictionPropsDto propsDto);
+    Task<List<PredictionWithCountDto>> GetVotedPredictionsWithCountAsync(PredictionPropsDto propsDto);
 }

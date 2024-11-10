@@ -11,25 +11,22 @@ public class PredictionsGetter(ILogger logger, List<YoloRunnerConfig> yoloRunner
 {
     private readonly HttpClient _client = new HttpClient();
 
-    public async Task<List<YoloRunnerResultDto>> RunYoloRunners(string photoUrl)
+    public async Task<List<YoloRunnerResultDto>> GetPredictions(string photoUrl, List<string> yoloModels)
     {
         var result = new List<YoloRunnerResultDto>();
         
-        await Parallel.ForEachAsync(yoloRunnersConfig, 
-            async (yoloRunner, cancellationToken) =>
+        await Parallel.ForEachAsync(yoloRunnersConfig, async (yoloRunner, cancellationToken) =>
         {
-            var modelsToRun = new ConcurrentQueue<string>(yoloRunner.Models);
+            var modelsToRun = new ConcurrentQueue<string>(yoloRunner.Models.Where(yoloModels.Contains));
             
-            await Parallel.ForEachAsync(yoloRunner.Urls, cancellationToken, 
-                async (url, cancellationToken) =>
+            await Parallel.ForEachAsync(yoloRunner.Urls, cancellationToken, async (url, token) =>
             {
                 while (!modelsToRun.IsEmpty)
                 {
                     if (!modelsToRun.TryDequeue(out var model))
                         continue;
 
-                    var requestResult = 
-                        await GetPredictions(url, photoUrl, model, cancellationToken);
+                    var requestResult = await RequestYoloRunner(url, photoUrl, model, token);
                     
                     var yoloRunnerResult = new YoloRunnerResultDto()
                     {
@@ -53,17 +50,17 @@ public class PredictionsGetter(ILogger logger, List<YoloRunnerConfig> yoloRunner
         return result;
     }
 
-    private async Task<List<PredictionDto>?> GetPredictions(string url, string photoUrl, string model,
-        CancellationToken cancellationToken)
+    private async Task<List<PredictionDto>?> RequestYoloRunner(string url, string photoUrl, string model,
+        CancellationToken token)
     {
         List<PredictionDto>? result = null;
         
         try
         {
             var uri = CreateRequestUri(url, photoUrl, model);
-            var response = await _client.GetAsync(uri, cancellationToken);
+            var response = await _client.GetAsync(uri, token);
 
-            var responseContent = await response.Content.ReadAsStringAsync(cancellationToken);
+            var responseContent = await response.Content.ReadAsStringAsync(token);
             
             if (!response.IsSuccessStatusCode)
             {

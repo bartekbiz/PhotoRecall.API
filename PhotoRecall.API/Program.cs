@@ -1,6 +1,8 @@
 using Data;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Logs;
+using PhotoRecall.API.Administration;
+using PhotoRecall.API.Info;
 using PhotoRecall.API.Middleware;
 using PhotoRecall.API.Predictions;
 
@@ -19,7 +21,7 @@ builder.Configuration.AddEnvironmentVariables();
 #endif
 
 builder.Services.Configure<UrlsConfig>(builder.Configuration.GetSection("Urls"));
-builder.Services.Configure<PathsConfig>(builder.Configuration.GetSection("Paths"));
+builder.Services.Configure<PhotosConfig>(builder.Configuration.GetSection("Photos"));
 builder.Services.Configure<List<YoloRunnerConfig>>(builder.Configuration.GetSection("YoloRunners"));
 
 var loggingConfig = new LoggingConfig();
@@ -50,6 +52,8 @@ builder.Services.AddScoped<ErrorHandlingMiddleware>();
 
 // Services
 builder.Services.AddScoped<IPredictionsService, PredictionsService>();
+builder.Services.AddScoped<IInfoService, InfoService>();
+builder.Services.AddScoped<IAdministratorService, AdministratorService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -58,11 +62,8 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI(options => options.EnableTryItOutByDefault());
-}
+app.UseSwagger();
+app.UseSwaggerUI(options => options.EnableTryItOutByDefault());
 
 app.UseMiddleware<InfoLoggingMiddleware>();
 app.UseMiddleware<ErrorHandlingMiddleware>();

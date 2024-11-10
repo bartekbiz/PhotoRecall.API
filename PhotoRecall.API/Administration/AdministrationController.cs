@@ -7,15 +7,13 @@ namespace PhotoRecall.API.Administration;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AdministrationController(IOptions<PathsConfig> pathsConfig) : ControllerBase
+public class AdministrationController(IAdministratorService administratorService) : ControllerBase
 {
-    private readonly PathsConfig _pathsConfig = pathsConfig.Value;
-
     [HttpDelete]
     [Route("ClearPhotosDir")]
     public IActionResult ClearPhotosDir()
     {
-        FileUtils.ClearDirectory(FileUtils.GetAbsolutePath(_pathsConfig.PhotosPath));
+        administratorService.ClearPhotosDir();
 
         return StatusCode(StatusCodes.Status204NoContent);
     }
