@@ -62,11 +62,8 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI(options => options.EnableTryItOutByDefault());
-}
+app.UseSwagger();
+app.UseSwaggerUI(options => options.EnableTryItOutByDefault());
 
 app.UseMiddleware<InfoLoggingMiddleware>();
 app.UseMiddleware<ErrorHandlingMiddleware>();
