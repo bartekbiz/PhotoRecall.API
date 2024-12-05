@@ -2,12 +2,12 @@ namespace Data.Dtos;
 
 public class PredictionDtoBase
 {
+    public int Class { get; set; }
     public string Name { get; set; }
 }
 
 public class PredictionDto : PredictionDtoBase
 {
-    public int Class { get; set; }
     public double? Confidence { get; set; }
     public BoxDto? Box { get; set; }
 }
