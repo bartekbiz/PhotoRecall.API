@@ -36,4 +36,14 @@ public class PredictionsController(IPredictionsService predictionsService) : Con
         
         return StatusCode(StatusCodes.Status200OK, predictions);
     }
+    
+    [HttpPost]
+    [Route("GetPredictionsAllDetectedAsync")]
+    public async Task<IActionResult> GetPredictionsAllDetectedAsync(PredictionPropsDto propsDto)
+    {
+        var predictions = await predictionsService
+            .GetPredictionsAllDetectedAsync(propsDto);
+        
+        return StatusCode(StatusCodes.Status200OK, predictions);
+    }
 }

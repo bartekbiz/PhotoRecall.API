@@ -55,23 +55,38 @@ public class PredictionsService : IPredictionsService
 
     #endregion
     
-    public async Task<List<YoloRunnerResultDto>> GetAllPredictionsAsync(IFormFile photo)
+    public async Task<List<YoloRunResultDto>> GetAllPredictionsAsync(IFormFile photo)
     {
         var modelsList = _infoService.GetAvailableYoloModelsAsync();
         ValidatePhoto(photo);
         
         return await GetPredictionsAsync(photo, modelsList);
     }
+   
+    public async Task<List<PredictionDtoBase>> GetPredictionsAllDetectedAsync(PredictionPropsDto propsDto)
+    {
+        return await GetMergedPredictions<PredictionDtoBase>(propsDto);
+    }
     
     public async Task<List<PredictionWithCountDto>> GetVotedPredictionsWithCountAsync(PredictionPropsDto propsDto)
     {
+        return await GetMergedPredictions<PredictionWithCountDto>(propsDto);
+    }
+    
+    private async Task<List<TResult>> GetMergedPredictions<TResult>(PredictionPropsDto propsDto)
+    {
         var predictions = await GetPredictionsAsync(propsDto);
 
-        var predictionsMerger = new PredictionsMergerWithCounts(predictions);
-        return predictionsMerger.Merge();
+        var predictionsMerger = PredictionsMergerFactory.Create<TResult>();
+        if (predictionsMerger == null)
+        {
+            throw new Exception("Could not merge predictions :(");
+        }
+        
+        return predictionsMerger.Merge(predictions);
     }
 
-    public async Task<List<YoloRunnerResultDto>> GetPredictionsAsync(PredictionPropsDto propsDto)
+    public async Task<List<YoloRunResultDto>> GetPredictionsAsync(PredictionPropsDto propsDto)
     {
         var modelsList = string.IsNullOrEmpty(propsDto.YoloModels) ? 
             _infoService.GetAvailableYoloModelsAsync() : 
@@ -82,7 +97,7 @@ public class PredictionsService : IPredictionsService
         return await GetPredictionsAsync(propsDto.Photo, modelsList!);
     }
 
-    private async Task<List<YoloRunnerResultDto>> GetPredictionsAsync(IFormFile photo, List<string> modelsList)
+    private async Task<List<YoloRunResultDto>> GetPredictionsAsync(IFormFile photo, List<string> modelsList)
     {
         var hostedPhoto = await FileUtils
             .SaveAndHostFile(_photosConfig.Path, _urlsConfig.ContainerUrl, photo);
