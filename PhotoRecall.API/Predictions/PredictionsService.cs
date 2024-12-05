@@ -65,25 +65,36 @@ public class PredictionsService : IPredictionsService
    
     public async Task<List<PredictionDtoBase>> GetPredictionsAllDetectedAsync(PredictionPropsDto propsDto)
     {
-        return await GetMergedPredictions<PredictionDtoBase>(propsDto);
+        var threshold = (propsDto.ModelPercentage / 100) * 
+                        _infoService.GetAvailableYoloModelsAsync().Count;
+
+        return await GetMergedPredictions<PredictionDtoBase>(propsDto, threshold);
     }
     
     public async Task<List<PredictionWithCountDto>> GetVotedPredictionsWithCountAsync(PredictionPropsDto propsDto)
     {
-        return await GetMergedPredictions<PredictionWithCountDto>(propsDto);
+        return await GetMergedPredictions<PredictionWithCountDto>(propsDto, new object());
     }
     
-    private async Task<List<TResult>> GetMergedPredictions<TResult>(PredictionPropsDto propsDto)
+    private async Task<List<TResult>> GetMergedPredictions<TResult>(PredictionPropsDto propsDto, object args)
     {
         var predictions = await GetPredictionsAsync(propsDto);
 
         var predictionsMerger = PredictionsMergerFactory.Create<TResult>();
-        if (predictionsMerger == null)
+        
+        try
+        {
+            if (predictionsMerger == null)
+            {
+                throw new Exception();
+            }
+            
+            return predictionsMerger.Merge(predictions, args);
+        }
+        catch
         {
             throw new Exception("Could not merge predictions :(");
         }
-        
-        return predictionsMerger.Merge(predictions);
     }
 
     public async Task<List<YoloRunResultDto>> GetPredictionsAsync(PredictionPropsDto propsDto)
@@ -103,7 +114,7 @@ public class PredictionsService : IPredictionsService
             .SaveAndHostFile(_photosConfig.Path, _urlsConfig.ContainerUrl, photo);
 
         var predictions = await _predictionsGetter
-            .GetPredictions(hostedPhoto.Uri, modelsList);
+            .GetPredictions("https://centricconsulting.com/wp-content/uploads/2018/07/Group-Meeting.jpg", modelsList);
 
         FileUtils.DeleteFile(hostedPhoto.Path);
 

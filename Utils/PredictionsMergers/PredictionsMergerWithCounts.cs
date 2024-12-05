@@ -19,9 +19,9 @@ public class PredictionsMergerWithCounts : PredictionsMerger<PredictionWithCount
 
     #region Merge
 
-    public override List<PredictionWithCountDto> Merge(List<YoloRunResultDto> predictions)
+    public override List<PredictionWithCountDto> Merge(List<YoloRunResultDto> predictions, object args)
     {
-        base.Merge(predictions);
+        base.Merge(predictions, args);
         
         if (Predictions.Count <= 0)
         {

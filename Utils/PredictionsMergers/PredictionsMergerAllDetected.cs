@@ -19,9 +19,11 @@ public class PredictionsMergerAllDetected : PredictionsMerger<PredictionDtoBase>
 
     #region Merge
 
-    public override List<PredictionDtoBase> Merge(List<YoloRunResultDto> predictions)
+    public override List<PredictionDtoBase> Merge(List<YoloRunResultDto> predictions, object args)
     {
-        base.Merge(predictions);
+        base.Merge(predictions, args);
+
+        var threshold = (double)args;
         
         if (Predictions.Count <= 0)
         {
@@ -33,6 +35,7 @@ public class PredictionsMergerAllDetected : PredictionsMerger<PredictionDtoBase>
         return _mergedPerModel
             .SelectMany(s => s.MergedPredictions)
             .GroupBy(g => g.Class)
+            .Where(g => g.Count() >= threshold)
             .Select(s => s.First())
             .ToList();
     }

@@ -4,14 +4,14 @@ namespace Utils.PredictionsMergers;
 
 public interface IPredictionsMerger<TResult>
 {
-    List<TResult> Merge(List<YoloRunResultDto> predictions);
+    List<TResult> Merge(List<YoloRunResultDto> predictions, object args);
 }
 
 public abstract class PredictionsMerger<TResult> : IPredictionsMerger<TResult>
 {
     protected List<YoloRunResultDto> Predictions = [];
     
-    public virtual List<TResult> Merge(List<YoloRunResultDto> predictions)
+    public virtual List<TResult> Merge(List<YoloRunResultDto> predictions, object args)
     {
         Predictions = predictions;
 
