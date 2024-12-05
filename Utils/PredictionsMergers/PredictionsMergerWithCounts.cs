@@ -5,19 +5,13 @@ namespace Utils.PredictionsMergers;
 
 public class PredictionsMergerWithCounts : PredictionsMerger<PredictionWithCountDto>
 {
-    private readonly List<YoloRunnerResultDto> _predictions;
-    private readonly List<MergedPerYoloRunner> _mergedPerYoloRunner = [];
-
-    public PredictionsMergerWithCounts(List<YoloRunnerResultDto> predictions)
-    {
-        _predictions = predictions;
-    }
+    private readonly List<MergedPerModel> _mergedPerModel = [];
 
     #region Structs
 
-    private struct MergedPerYoloRunner
+    private struct MergedPerModel
     {
-        public YoloRunnerInfoDto YoloRunnerInfoDto { get; set; }
+        public YoloRunInfoDto YoloRunInfoDto { get; set; }
         public List<PredictionWithCountDto> MergedPredictions { get; set; }
     }
 
@@ -25,71 +19,79 @@ public class PredictionsMergerWithCounts : PredictionsMerger<PredictionWithCount
 
     #region Merge
 
-    public override List<PredictionWithCountDto> Merge()
+    public override List<PredictionWithCountDto> Merge(List<YoloRunResultDto> predictions)
     {
-        if (_predictions.Count <= 0)
+        base.Merge(predictions);
+        
+        if (Predictions.Count <= 0)
         {
             return [];
         }
         
-        MergePerYoloRunner();
+        MergePerModel();
         
         return Vote();
     }
 
-    private void MergePerYoloRunner()
+    private void MergePerModel()
     {
-        foreach (var yoloRunnerResult in _predictions)
+        foreach (var yoloRunResult in Predictions)
         {
-            if (yoloRunnerResult.Predictions == null)
+            if (yoloRunResult.Predictions == null)
                 continue;
 
-            var merged = yoloRunnerResult.Predictions
-                .GroupBy(g => g.Name)
-                .Select(group => new PredictionWithCountDto
+            var merged = yoloRunResult.Predictions
+                .GroupBy(g => g.Class)
+                .Select(group =>
                 {
-                    Name = group.Key, 
-                    Count = group.Count()
+                    var firstItem = group.FirstOrDefault();
+                    
+                    return new PredictionWithCountDto
+                    {
+                        Class = group.Key,
+                        Name = firstItem != null ? firstItem.Name : string.Empty,
+                        Count = group.Count()
+                    };
                 })
                 .ToList();
 
-            _mergedPerYoloRunner.Add(new MergedPerYoloRunner
+            _mergedPerModel.Add(new MergedPerModel
             {
-                YoloRunnerInfoDto = yoloRunnerResult.YoloRunnerInfo,
+                YoloRunInfoDto = yoloRunResult.YoloRunInfo,
                 MergedPredictions = merged
             });
         }
     }
-
-    #endregion
     
     #region Vote
 
     private List<PredictionWithCountDto> Vote()
     {
-        var groupsByName = _mergedPerYoloRunner
+        var groupsByClass = _mergedPerModel
             .SelectMany(s => s.MergedPredictions)
-            .GroupBy(g => g.Name);
+            .GroupBy(g => g.Class);
 
-        var result = groupsByName
-            .Select(group => 
-                new PredictionWithCountDto
-                {
-                    Name = group.Key, 
-                    Count = VoteOnClassCount(group, _mergedPerYoloRunner.Count)
-                }).ToList();
+        var result = groupsByClass
+            .Select(group =>
+            {
+                var firstItem = group.First();
+                firstItem.Count = VoteOnClassCount(group, _mergedPerModel.Count);
+                return firstItem;
+            }).ToList();
 
         return result
             .Where(w => w.Count != 0)
             .ToList();
     }
 
-    private static int VoteOnClassCount(IGrouping<string, PredictionWithCountDto> group, int yoloRunnerCount)
+    private static int VoteOnClassCount(IGrouping<int, PredictionWithCountDto> group, int modelCount)
     {
         return (int)Math.Round((double)group
             .Select(s => s.Count)
-            .Sum() / yoloRunnerCount);
+            .Sum() / modelCount);
     }
 
+    #endregion
+    
     #endregion
 }
