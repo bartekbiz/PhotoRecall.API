@@ -2,7 +2,37 @@ using Data.Dtos;
 
 namespace Utils.PredictionsMergers;
 
-public abstract class PredictionsMerger<TResult> where TResult : PredictionDtoBase
+public interface IPredictionsMerger<TResult>
 {
-    public abstract List<TResult> Merge();
+    List<TResult> Merge(List<YoloRunResultDto> predictions);
+}
+
+public abstract class PredictionsMerger<TResult> : IPredictionsMerger<TResult>
+{
+    protected List<YoloRunResultDto> Predictions = [];
+    
+    public virtual List<TResult> Merge(List<YoloRunResultDto> predictions)
+    {
+        Predictions = predictions;
+
+        return [];
+    }
+} 
+
+public static class PredictionsMergerFactory
+{
+    public static IPredictionsMerger<TResult>? Create<TResult>()
+    {
+        if (typeof(TResult) == typeof(PredictionDtoBase))
+        {
+            return (IPredictionsMerger<TResult>) new PredictionsMergerAllDetected();
+        }
+        
+        if (typeof(TResult) == typeof(PredictionWithCountDto))
+        {
+            return (IPredictionsMerger<TResult>) new PredictionsMergerWithCounts();
+        }
+        
+        return null;
+    }
 }
