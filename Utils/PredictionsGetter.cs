@@ -11,9 +11,9 @@ public class PredictionsGetter(ILogger logger, List<YoloRunnerConfig> yoloRunner
 {
     private readonly HttpClient _client = new HttpClient();
 
-    public async Task<List<YoloRunnerResultDto>> GetPredictions(string photoUrl, List<string> yoloModels)
+    public async Task<List<YoloRunResultDto>> GetPredictions(string photoUrl, List<string> yoloModels)
     {
-        var result = new List<YoloRunnerResultDto>();
+        var result = new List<YoloRunResultDto>();
         
         await Parallel.ForEachAsync(yoloRunnersConfig, async (yoloRunner, cancellationToken) =>
         {
@@ -28,12 +28,12 @@ public class PredictionsGetter(ILogger logger, List<YoloRunnerConfig> yoloRunner
 
                     var requestResult = await RequestYoloRunner(url, photoUrl, model, token);
                     
-                    var yoloRunnerResult = new YoloRunnerResultDto()
+                    var yoloRunnerResult = new YoloRunResultDto()
                     {
-                        YoloRunnerInfo = new YoloRunnerInfoDto()
+                        YoloRunInfo = new YoloRunInfoDto()
                         {
-                            Name = yoloRunner.Name,
-                            Url = url,
+                            YoloRunnerName = yoloRunner.Name,
+                            YoloRunnerUrl = url,
                             Model = model
                         },
                         Predictions = requestResult,
