@@ -65,8 +65,7 @@ public class PredictionsService : IPredictionsService
    
     public async Task<List<PredictionDtoBase>> GetPredictionsAllDetectedAsync(PredictionPropsDto propsDto)
     {
-        var threshold = (propsDto.ModelPercentage / 100) * 
-                        _infoService.GetAvailableYoloModelsAsync().Count;
+        var threshold = propsDto.AgreeRatio * _infoService.GetAvailableYoloModelsAsync().Count;
 
         return await GetMergedPredictions<PredictionDtoBase>(propsDto, threshold);
     }

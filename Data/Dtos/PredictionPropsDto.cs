@@ -6,5 +6,5 @@ public class PredictionPropsDto
 {
     public IFormFile Photo { get; set; }
     public string YoloModels { get; set; } = string.Empty;
-    public double ModelPercentage { get; set; } = 0;
+    public double AgreeRatio { get; set; } = 0;
 }
