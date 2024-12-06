@@ -5,20 +5,6 @@ namespace Utils.PredictionsMergers;
 
 public class PredictionsMergerWithCounts : PredictionsMerger<PredictionWithCountDto>
 {
-    private readonly List<MergedPerModel> _mergedPerModel = [];
-
-    #region Structs
-
-    private struct MergedPerModel
-    {
-        public YoloRunInfoDto YoloRunInfoDto { get; set; }
-        public List<PredictionWithCountDto> MergedPredictions { get; set; }
-    }
-
-    #endregion
-
-    #region Merge
-
     public override List<PredictionWithCountDto> Merge(List<YoloRunResultDto> predictions, object args)
     {
         base.Merge(predictions, args);
@@ -28,46 +14,32 @@ public class PredictionsMergerWithCounts : PredictionsMerger<PredictionWithCount
             return [];
         }
         
-        MergePerModel();
+        MergePerModel(MergeDelegate);
         
         return Vote();
     }
-
-    private void MergePerModel()
-    {
-        foreach (var yoloRunResult in Predictions)
-        {
-            if (yoloRunResult.Predictions == null)
-                continue;
-
-            var merged = yoloRunResult.Predictions
-                .GroupBy(g => g.Class)
-                .Select(group =>
-                {
-                    var firstItem = group.FirstOrDefault();
-                    
-                    return new PredictionWithCountDto
-                    {
-                        Class = group.Key,
-                        Name = firstItem != null ? firstItem.Name : string.Empty,
-                        Count = group.Count()
-                    };
-                })
-                .ToList();
-
-            _mergedPerModel.Add(new MergedPerModel
-            {
-                YoloRunInfoDto = yoloRunResult.YoloRunInfo,
-                MergedPredictions = merged
-            });
-        }
-    }
     
-    #region Vote
+    private List<PredictionWithCountDto> MergeDelegate(List<PredictionDto> predictions)
+    {
+        return predictions
+            .GroupBy(g => g.Class)
+            .Select(group =>
+            {
+                var firstItem = group.FirstOrDefault();
+                    
+                return new PredictionWithCountDto
+                {
+                    Class = group.Key,
+                    Name = firstItem != null ? firstItem.Name : string.Empty,
+                    Count = group.Count()
+                };
+            })
+            .ToList();
+    }
 
     private List<PredictionWithCountDto> Vote()
     {
-        var groupsByClass = _mergedPerModel
+        var groupsByClass = MergedPerModel
             .SelectMany(s => s.MergedPredictions)
             .GroupBy(g => g.Class);
 
@@ -75,7 +47,7 @@ public class PredictionsMergerWithCounts : PredictionsMerger<PredictionWithCount
             .Select(group =>
             {
                 var firstItem = group.First();
-                firstItem.Count = VoteOnClassCount(group, _mergedPerModel.Count);
+                firstItem.Count = VoteOnClassCount(group, MergedPerModel.Count);
                 return firstItem;
             }).ToList();
 
@@ -90,8 +62,4 @@ public class PredictionsMergerWithCounts : PredictionsMerger<PredictionWithCount
             .Select(s => s.Count)
             .Sum() / modelCount);
     }
-
-    #endregion
-    
-    #endregion
 }
