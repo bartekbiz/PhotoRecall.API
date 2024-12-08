@@ -112,7 +112,7 @@ public class PredictionsService : IPredictionsService
             .SaveAndHostFile(_photosConfig.Path, _urlsConfig.ContainerUrl, photo);
 
         var predictions = await _predictionsGetter
-            .GetPredictions("https://centricconsulting.com/wp-content/uploads/2018/07/Group-Meeting.jpg", modelsList);
+            .GetPredictions(hostedPhoto.Uri, modelsList);
 
         FileUtils.DeleteFile(hostedPhoto.Path);
 
