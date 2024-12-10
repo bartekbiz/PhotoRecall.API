@@ -133,7 +133,7 @@ public class PredictionsService : IPredictionsService
 
     private void ValidatePhoto(IFormFile photo)
     {
-        var fileExtension = photo.FileName.Split(".").Last();
+        var fileExtension = photo.FileName.Split(".").Last().ToLower();
         if (!_photosConfig.AcceptedTypes.Contains(fileExtension))
         {
             throw new BadRequestException($"File type \".{fileExtension}\" is not supported.");
