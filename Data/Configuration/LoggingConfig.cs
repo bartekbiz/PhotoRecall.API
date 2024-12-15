@@ -1,4 +1,4 @@
-namespace Data;
+namespace Data.Configuration;
 
 public class LoggingConfig
 {
