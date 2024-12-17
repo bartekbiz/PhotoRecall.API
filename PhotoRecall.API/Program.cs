@@ -1,10 +1,14 @@
 using Data;
+using Data.Configuration;
+using Data.Enums;
+using Newtonsoft.Json;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Logs;
 using PhotoRecall.API.Administration;
 using PhotoRecall.API.Info;
 using PhotoRecall.API.Middleware;
 using PhotoRecall.API.Predictions;
+using PhotoRecall.API.Search;
 
 var builder = WebApplication.CreateBuilder(new WebApplicationOptions
 {
@@ -21,6 +25,7 @@ builder.Configuration.AddEnvironmentVariables();
 #endif
 
 builder.Services.Configure<UrlsConfig>(builder.Configuration.GetSection("Urls"));
+builder.Services.Configure<ApiConfig>(builder.Configuration.GetSection("Apis"));
 builder.Services.Configure<PhotosConfig>(builder.Configuration.GetSection("Photos"));
 builder.Services.Configure<List<YoloRunnerConfig>>(builder.Configuration.GetSection("YoloRunners"));
 
@@ -53,6 +58,7 @@ builder.Services.AddScoped<ErrorHandlingMiddleware>();
 // Services
 builder.Services.AddScoped<IPredictionsService, PredictionsService>();
 builder.Services.AddScoped<IInfoService, InfoService>();
+builder.Services.AddScoped<ISearchService, SearchService>();
 builder.Services.AddScoped<IAdministratorService, AdministratorService>();
 
 builder.Services.AddEndpointsApiExplorer();

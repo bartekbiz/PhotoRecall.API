@@ -65,7 +65,8 @@ public class PredictionsService : IPredictionsService
    
     public async Task<List<PredictionDtoBase>> GetPredictionsAllDetectedAsync(PredictionPropsDto propsDto)
     {
-        var threshold = propsDto.AgreeRatio * _infoService.GetAvailableYoloModelsAsync().Count;
+        var modelCount = GetModelsList(propsDto).Count;
+        var threshold = propsDto.AgreeRatio * modelCount;
 
         return await GetMergedPredictions<PredictionDtoBase>(propsDto, threshold);
     }
@@ -98,9 +99,7 @@ public class PredictionsService : IPredictionsService
 
     public async Task<List<YoloRunResultDto>> GetPredictionsAsync(PredictionPropsDto propsDto)
     {
-        var modelsList = string.IsNullOrEmpty(propsDto.YoloModels) ? 
-            _infoService.GetAvailableYoloModelsAsync() : 
-            OtherUtils.ConvertJsonStringToList(propsDto.YoloModels);
+        var modelsList = GetModelsList(propsDto);
         
         ValidateProps(propsDto.Photo, modelsList);
 
@@ -134,7 +133,7 @@ public class PredictionsService : IPredictionsService
 
     private void ValidatePhoto(IFormFile photo)
     {
-        var fileExtension = photo.FileName.Split(".").Last();
+        var fileExtension = photo.FileName.Split(".").Last().ToLower();
         if (!_photosConfig.AcceptedTypes.Contains(fileExtension))
         {
             throw new BadRequestException($"File type \".{fileExtension}\" is not supported.");
@@ -142,4 +141,13 @@ public class PredictionsService : IPredictionsService
     }
 
     #endregion
+
+    private List<string> GetModelsList(PredictionPropsDto propsDto)
+    {
+        var modelsListProps = string.IsNullOrEmpty(propsDto.YoloModels) ?
+            null : 
+            OtherUtils.ConvertJsonStringToList(propsDto.YoloModels);
+
+        return modelsListProps ?? _infoService.GetAvailableYoloModelsAsync();
+    }
 }
