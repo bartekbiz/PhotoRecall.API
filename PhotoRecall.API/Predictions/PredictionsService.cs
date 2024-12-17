@@ -66,7 +66,7 @@ public class PredictionsService : IPredictionsService
     public async Task<List<PredictionDtoBase>> GetPredictionsAllDetectedAsync(PredictionPropsDto propsDto)
     {
         var modelCount = GetModelsList(propsDto).Count;
-        var threshold = propsDto.AgreeRatio * modelCount;
+        var threshold = (propsDto.AgreeRatio / 100) * modelCount;
 
         return await GetMergedPredictions<PredictionDtoBase>(propsDto, threshold);
     }
