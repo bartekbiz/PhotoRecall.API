@@ -7,11 +7,20 @@ namespace PhotoRecall.API.Info;
 public class InfoController(IInfoService infoService) : ControllerBase
 {
     [HttpGet]
-    [Route("GetAllYoloModelsAsync")]
-    public IActionResult GetAvailableYoloModelsAsync()
+    [Route("GetAvailableYoloModels")]
+    public IActionResult GetAvailableYoloModels()
     {
-        var yoloModels = infoService.GetAvailableYoloModelsAsync();
+        var yoloModels = infoService.GetAvailableYoloModels();
         
         return StatusCode(StatusCodes.Status200OK, yoloModels);
+    }
+    
+    [HttpGet]
+    [Route("GetAllYoloClasses")]
+    public IActionResult GetAllYoloClasses()
+    {
+        var yoloClasses = infoService.GetAllYoloClasses();
+        
+        return StatusCode(StatusCodes.Status200OK, yoloClasses);
     }
 }
