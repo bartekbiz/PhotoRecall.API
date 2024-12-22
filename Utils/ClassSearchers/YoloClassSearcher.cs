@@ -7,14 +7,14 @@ using Newtonsoft.Json;
 
 namespace Utils;
 
-public class YoloClassSearcher : ClassSearcher<YoloClass>
+public class YoloClassSearcher : ClassSearcher<YoloClassEnum>
 {
     public YoloClassSearcher(SynonymsConfig synonymsConfig) : base(synonymsConfig)
     { }
     
-    public override async Task<List<YoloClass>> Search(string input)
+    public override async Task<List<YoloClassEnum>> Search(string input)
     {
-        var result = new List<YoloClass>();
+        var result = new List<YoloClassEnum>();
         var phrasesToCheck = new List<string> { input };
         phrasesToCheck.AddRange(await GetSynonyms(input));
         
@@ -50,11 +50,11 @@ public class YoloClassSearcher : ClassSearcher<YoloClass>
         return result?.Synonyms ?? [];
     }
     
-    private YoloClass? MapPhraseToClass(string phrase)
+    private YoloClassEnum? MapPhraseToClass(string phrase)
     {
         phrase = phrase.Trim().Replace(" ", "").ToLower();
         
-        if (Enum.TryParse(phrase, ignoreCase: true, out YoloClass yoloClass))
+        if (Enum.TryParse(phrase, ignoreCase: true, out YoloClassEnum yoloClass))
         {
             return yoloClass;
         }

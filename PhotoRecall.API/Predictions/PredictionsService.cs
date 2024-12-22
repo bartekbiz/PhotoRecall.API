@@ -57,7 +57,7 @@ public class PredictionsService : IPredictionsService
     
     public async Task<List<YoloRunResultDto>> GetAllPredictionsAsync(IFormFile photo)
     {
-        var modelsList = _infoService.GetAvailableYoloModelsAsync();
+        var modelsList = _infoService.GetAvailableYoloModels();
         ValidatePhoto(photo);
         
         return await GetPredictionsAsync(photo, modelsList);
@@ -148,6 +148,6 @@ public class PredictionsService : IPredictionsService
             null : 
             OtherUtils.ConvertJsonStringToList(propsDto.YoloModels);
 
-        return modelsListProps ?? _infoService.GetAvailableYoloModelsAsync();
+        return modelsListProps ?? _infoService.GetAvailableYoloModels();
     }
 }

@@ -16,7 +16,7 @@ public class SearchService : ISearchService
         _apisConfig = apisConfig.Value;
     }
     
-    public async Task<List<YoloClass>> GetYoloClassesAsync(string phrase)
+    public async Task<List<YoloClassEnum>> GetYoloClassesAsync(string phrase)
     {
         var yoloClassSearcher = new YoloClassSearcher(_apisConfig.Synonyms);
 

@@ -1,6 +1,6 @@
 namespace Data.Enums;
 
-public enum YoloClass
+public enum YoloClassEnum
 {
     Person = 0,
     Bicycle = 1,
