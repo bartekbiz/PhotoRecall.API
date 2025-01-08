@@ -1,6 +1,9 @@
+using Data.Dtos;
+
 namespace PhotoRecall.API.Info;
 
 public interface IInfoService
 {
-    List<string> GetAvailableYoloModelsAsync();
+    List<string> GetAvailableYoloModels();
+    List<DetectionClassDto> GetAllDetectionClasses();
 }

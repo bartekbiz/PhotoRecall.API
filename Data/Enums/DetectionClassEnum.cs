@@ -1,7 +1,9 @@
 namespace Data.Enums;
 
-public enum YoloClass
+public enum DetectionClassEnum
 {
+    #region YoloClasses
+
     Person = 0,
     Bicycle = 1,
     Car = 2,
@@ -82,4 +84,6 @@ public enum YoloClass
     TeddyBear = 77,
     HairDrier = 78,
     Toothbrush = 79
+
+    #endregion
 }

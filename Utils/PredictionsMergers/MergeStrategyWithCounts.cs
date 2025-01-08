@@ -3,9 +3,9 @@ using Data.Dtos;
 
 namespace Utils.PredictionsMergers;
 
-public class PredictionsMergerWithCounts : PredictionsMerger<PredictionWithCountDto>
+public class MergeStrategyWithCounts : MergeStrategyBase
 {
-    public override List<PredictionWithCountDto> Merge(List<YoloRunResultDto> predictions, object args)
+    public override List<PredictionDtoMerged> Merge(List<ModelRunResultDto> predictions, object args)
     {
         base.Merge(predictions, args);
         
@@ -19,7 +19,7 @@ public class PredictionsMergerWithCounts : PredictionsMerger<PredictionWithCount
         return Vote();
     }
     
-    private List<PredictionWithCountDto> MergeDelegate(List<PredictionDto> predictions)
+    private List<PredictionDtoMerged> MergeDelegate(List<PredictionDto> predictions)
     {
         return predictions
             .GroupBy(g => g.Class)
@@ -27,7 +27,7 @@ public class PredictionsMergerWithCounts : PredictionsMerger<PredictionWithCount
             {
                 var firstItem = group.FirstOrDefault();
                     
-                return new PredictionWithCountDto
+                return new PredictionDtoMerged
                 {
                     Class = group.Key,
                     Name = firstItem != null ? firstItem.Name : string.Empty,
@@ -37,7 +37,7 @@ public class PredictionsMergerWithCounts : PredictionsMerger<PredictionWithCount
             .ToList();
     }
 
-    private List<PredictionWithCountDto> Vote()
+    private List<PredictionDtoMerged> Vote()
     {
         var groupsByClass = MergedPerModel
             .SelectMany(s => s.MergedPredictions)
@@ -56,7 +56,7 @@ public class PredictionsMergerWithCounts : PredictionsMerger<PredictionWithCount
             .ToList();
     }
 
-    private static int VoteOnClassCount(IGrouping<int, PredictionWithCountDto> group, int modelCount)
+    private static int VoteOnClassCount(IGrouping<int, PredictionDtoMerged> group, int modelCount)
     {
         return (int)Math.Round((double)group
             .Select(s => s.Count)

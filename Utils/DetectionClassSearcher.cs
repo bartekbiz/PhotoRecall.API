@@ -1,4 +1,3 @@
-using Data;
 using Data.Configuration;
 using Data.Dtos;
 using Data.Enums;
@@ -7,14 +6,18 @@ using Newtonsoft.Json;
 
 namespace Utils;
 
-public class YoloClassSearcher : ClassSearcher<YoloClass>
+public class DetectionClassSearcher
 {
-    public YoloClassSearcher(SynonymsConfig synonymsConfig) : base(synonymsConfig)
-    { }
-    
-    public override async Task<List<YoloClass>> Search(string input)
+    private SynonymsConfig _synonymsConfig;
+
+    public DetectionClassSearcher(SynonymsConfig synonymsConfig)
     {
-        var result = new List<YoloClass>();
+        _synonymsConfig = synonymsConfig;
+    }
+    
+    public async Task<List<DetectionClassEnum>> Search(string input)
+    {
+        var result = new List<DetectionClassEnum>();
         var phrasesToCheck = new List<string> { input };
         phrasesToCheck.AddRange(await GetSynonyms(input));
         
@@ -34,10 +37,10 @@ public class YoloClassSearcher : ClassSearcher<YoloClass>
         var client = new HttpClient();
         
         var query = new Dictionary<string, string> { ["word"] = phrase };
-        var uri = QueryHelpers.AddQueryString(SynonymsConfig.Uri, query);
+        var uri = QueryHelpers.AddQueryString(_synonymsConfig.Uri, query);
         
         var request = new HttpRequestMessage(HttpMethod.Get, uri);
-        request.Headers.Add("X-Api-Key", SynonymsConfig.Key.Trim());
+        request.Headers.Add("X-Api-Key", _synonymsConfig.Key.Trim());
         
         var response = await client.SendAsync(request);
 
@@ -50,11 +53,11 @@ public class YoloClassSearcher : ClassSearcher<YoloClass>
         return result?.Synonyms ?? [];
     }
     
-    private YoloClass? MapPhraseToClass(string phrase)
+    private DetectionClassEnum? MapPhraseToClass(string phrase)
     {
         phrase = phrase.Trim().Replace(" ", "").ToLower();
         
-        if (Enum.TryParse(phrase, ignoreCase: true, out YoloClass yoloClass))
+        if (Enum.TryParse(phrase, ignoreCase: true, out DetectionClassEnum yoloClass))
         {
             return yoloClass;
         }
