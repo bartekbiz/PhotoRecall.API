@@ -3,11 +3,11 @@ using Data.Dtos;
 
 namespace Utils.PredictionsMergers;
 
-public class PredictionsMergerAllDetected : PredictionsMerger<PredictionDtoBase>
+public class PredictionsMergerAllDetected : PredictionsMerger
 {
     private double _threshold;
     
-    public override List<PredictionDtoBase> Merge(List<YoloRunResultDto> predictions, object args)
+    public override List<PredictionDtoMerged> Merge(List<ModelRunResultDto> predictions, object args)
     {
         base.Merge(predictions, args);
 
@@ -23,7 +23,7 @@ public class PredictionsMergerAllDetected : PredictionsMerger<PredictionDtoBase>
         return Vote();
     }
 
-    private List<PredictionDtoBase> MergeDelegate(List<PredictionDto> predictions)
+    private List<PredictionDtoMerged> MergeDelegate(List<PredictionDto> predictions)
     {
         return predictions
             .GroupBy(g => g.Class)
@@ -31,7 +31,7 @@ public class PredictionsMergerAllDetected : PredictionsMerger<PredictionDtoBase>
             {
                 var firstItem = group.FirstOrDefault();
                     
-                return new PredictionDtoBase
+                return new PredictionDtoMerged
                 {
                     Class = group.Key,
                     Name = firstItem != null ? firstItem.Name : string.Empty,
@@ -40,7 +40,7 @@ public class PredictionsMergerAllDetected : PredictionsMerger<PredictionDtoBase>
             .ToList();
     }
 
-    private List<PredictionDtoBase> Vote()
+    private List<PredictionDtoMerged> Vote()
     {
         return MergedPerModel
             .SelectMany(s => s.MergedPredictions)

@@ -2,24 +2,24 @@ using Data.Dtos;
 
 namespace Utils.PredictionsMergers;
 
-public interface IPredictionsMerger<TResult>
+public interface IPredictionsMerger
 {
-    List<TResult> Merge(List<YoloRunResultDto> predictions, object args);
+    List<PredictionDtoMerged> Merge(List<ModelRunResultDto> predictions, object args);
 }
 
-public abstract class PredictionsMerger<TResult> : IPredictionsMerger<TResult>
+public abstract class PredictionsMerger : IPredictionsMerger
 {
-    protected List<YoloRunResultDto> Predictions = [];
+    protected List<ModelRunResultDto> Predictions = [];
     protected List<MergedForModel> MergedPerModel = [];
     
-    public virtual List<TResult> Merge(List<YoloRunResultDto> predictions, object args)
+    public virtual List<PredictionDtoMerged> Merge(List<ModelRunResultDto> predictions, object args)
     {
         Predictions = predictions;
 
         return [];
     }
     
-    protected void MergePerModel(Func<List<PredictionDto>, List<TResult>> mergeDelegate)
+    protected void MergePerModel(Func<List<PredictionDto>, List<PredictionDtoMerged>> mergeDelegate)
     {
         foreach (var yoloRunResult in Predictions)
         {
@@ -30,7 +30,7 @@ public abstract class PredictionsMerger<TResult> : IPredictionsMerger<TResult>
 
             MergedPerModel.Add(new MergedForModel
             {
-                YoloRunInfoDto = yoloRunResult.YoloRunInfo,
+                ModelRunInfoDto = yoloRunResult.ModelRunInfo,
                 MergedPredictions = merged
             });
         }
@@ -40,27 +40,37 @@ public abstract class PredictionsMerger<TResult> : IPredictionsMerger<TResult>
 
     protected struct MergedForModel
     {
-        public YoloRunInfoDto YoloRunInfoDto { get; set; }
-        public List<TResult> MergedPredictions { get; set; }
+        public ModelRunInfoDto ModelRunInfoDto { get; set; }
+        public List<PredictionDtoMerged> MergedPredictions { get; set; }
     }
 
     #endregion
-} 
+}
+
+public enum PredictionsMergerType
+{
+    AllDetected,
+    VotedWithCounts
+}
 
 public static class PredictionsMergerFactory
 {
-    public static IPredictionsMerger<TResult>? Create<TResult>()
+    public static IPredictionsMerger? Create(PredictionsMergerType mergerType)
     {
-        if (typeof(TResult) == typeof(PredictionDtoBase))
+        switch (mergerType)
         {
-            return (IPredictionsMerger<TResult>) new PredictionsMergerAllDetected();
+            case PredictionsMergerType.AllDetected:
+            {
+                return new PredictionsMergerAllDetected();
+            }
+            case PredictionsMergerType.VotedWithCounts:
+            {
+                return new PredictionsMergerWithCounts();
+            }
+            default:
+            {
+                return null;
+            }
         }
-        
-        if (typeof(TResult) == typeof(PredictionWithCountDto))
-        {
-            return (IPredictionsMerger<TResult>) new PredictionsMergerWithCounts();
-        }
-        
-        return null;
     }
 }

@@ -20,7 +20,7 @@ public class BoxDto
     public double Y2 { get; set; }
 }
 
-public class PredictionWithCountDto : PredictionDtoBase
+public class PredictionDtoMerged : PredictionDtoBase
 {
     public int Count { get; set; }
 }
