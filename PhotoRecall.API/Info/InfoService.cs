@@ -18,12 +18,12 @@ public class InfoService(IOptions<List<ModelRunnerConfig>> yoloRunnersConfig) : 
     {
         var result = new List<YoloClassDto>();
         
-        foreach (YoloClassEnum yoloClass in (YoloClassEnum[]) Enum.GetValues(typeof(YoloClassEnum)))
+        foreach (DetectionClassEnum yoloClass in (DetectionClassEnum[]) Enum.GetValues(typeof(DetectionClassEnum)))
         {
             result.Add(new YoloClassDto
             {
                 Class = (int)yoloClass,
-                Name = Enum.GetName(typeof(YoloClassEnum), yoloClass) ?? string.Empty
+                Name = Enum.GetName(typeof(DetectionClassEnum), yoloClass) ?? string.Empty
             });
         }
 
