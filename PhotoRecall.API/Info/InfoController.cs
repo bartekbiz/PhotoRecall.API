@@ -16,10 +16,10 @@ public class InfoController(IInfoService infoService) : ControllerBase
     }
     
     [HttpGet]
-    [Route("GetAllYoloClasses")]
-    public IActionResult GetAllYoloClasses()
+    [Route("GetAllDetectionClasses")]
+    public IActionResult GetAllDetectionClasses()
     {
-        var yoloClasses = infoService.GetAllYoloClasses();
+        var yoloClasses = infoService.GetAllDetectionClasses();
         
         return StatusCode(StatusCodes.Status200OK, yoloClasses);
     }

@@ -14,13 +14,13 @@ public class InfoService(IOptions<List<ModelRunnerConfig>> yoloRunnersConfig) : 
         return _modelRunnersConfig.SelectMany(s => s.Models).ToList();
     }
 
-    public List<YoloClassDto> GetAllYoloClasses()
+    public List<DetectionClassDto> GetAllDetectionClasses()
     {
-        var result = new List<YoloClassDto>();
+        var result = new List<DetectionClassDto>();
         
         foreach (DetectionClassEnum yoloClass in (DetectionClassEnum[]) Enum.GetValues(typeof(DetectionClassEnum)))
         {
-            result.Add(new YoloClassDto
+            result.Add(new DetectionClassDto
             {
                 Class = (int)yoloClass,
                 Name = Enum.GetName(typeof(DetectionClassEnum), yoloClass) ?? string.Empty
