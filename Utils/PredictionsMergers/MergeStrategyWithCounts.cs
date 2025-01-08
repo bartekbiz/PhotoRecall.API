@@ -3,7 +3,7 @@ using Data.Dtos;
 
 namespace Utils.PredictionsMergers;
 
-public class PredictionsMergerWithCounts : PredictionsMerger
+public class MergeStrategyWithCounts : MergeStrategyBase
 {
     public override List<PredictionDtoMerged> Merge(List<ModelRunResultDto> predictions, object args)
     {

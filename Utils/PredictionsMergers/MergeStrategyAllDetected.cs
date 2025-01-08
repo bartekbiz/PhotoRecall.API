@@ -3,7 +3,7 @@ using Data.Dtos;
 
 namespace Utils.PredictionsMergers;
 
-public class PredictionsMergerAllDetected : PredictionsMerger
+public class MergeStrategyAllDetected : MergeStrategyBase
 {
     private double _threshold;
     

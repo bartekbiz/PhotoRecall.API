@@ -16,6 +16,7 @@ public class PredictionsService : IPredictionsService
     private readonly PhotosConfig _photosConfig;
     private readonly UrlsConfig _urlsConfig;
     private readonly PredictionsGetter _predictionsGetter;
+    private readonly MergingContext _mergingContext;
 
     public PredictionsService(ILogger<PredictionsService> logger,
         IInfoService infoService,
@@ -30,6 +31,7 @@ public class PredictionsService : IPredictionsService
         _photosConfig = photosConfig.Value;
         _urlsConfig = urlsConfig.Value;
         _predictionsGetter = new PredictionsGetter(logger, _modelRunnersConfig);
+        _mergingContext = new MergingContext();
     }
     
     #region GetMergedPredictions
@@ -39,33 +41,36 @@ public class PredictionsService : IPredictionsService
         var modelCount = GetModelsList(propsDto).Count;
         var threshold = (propsDto.AgreeRatio / 100) * modelCount;
 
-        return await GetMergedPredictions(PredictionsMergerType.AllDetected, propsDto, threshold);
+        var mergeStrategy = new MergeStrategyAllDetected();
+        return await GetMergedPredictions(mergeStrategy, propsDto, threshold);
     }
     
     public async Task<List<PredictionDtoMerged>> GetVotedPredictionsWithCountAsync(PredictionPropsDto propsDto)
     {
-        return await GetMergedPredictions(PredictionsMergerType.VotedWithCounts, propsDto, new object());
+        var mergeStrategy = new MergeStrategyWithCounts();
+        return await GetMergedPredictions(mergeStrategy, propsDto);
+    }
+
+    private async Task<List<PredictionDtoMerged>> GetMergedPredictions(
+        IMergeStrategy strategy, PredictionPropsDto propsDto)
+    {
+        return await GetMergedPredictions(strategy, propsDto, new object());
     }
     
-    private async Task<List<PredictionDtoMerged>> GetMergedPredictions(PredictionsMergerType mergerType, 
-        PredictionPropsDto propsDto, object args)
+    private async Task<List<PredictionDtoMerged>> GetMergedPredictions( 
+        IMergeStrategy strategy, PredictionPropsDto propsDto, object args)
     {
         var predictions = await GetPredictionsAsync(propsDto);
-
-        var predictionsMerger = PredictionsMergerFactory.Create(mergerType);
         
         try
         {
-            if (predictionsMerger == null)
-            {
-                throw new Exception();
-            }
-            
-            return predictionsMerger.Merge(predictions, args);
+            _mergingContext.SetStrategy(strategy);
+            return _mergingContext.Merge(predictions, args);
         }
-        catch
+        catch (Exception e)
         {
-            throw new Exception("Could not merge predictions :(");
+            _logger.LogError(e.Message);
+            throw new Exception("Could not merge predictions :(. Please contact administrator.");
         }
     }
     
@@ -96,7 +101,7 @@ public class PredictionsService : IPredictionsService
             .SaveAndHostFile(_photosConfig.Path, _urlsConfig.ContainerUrl, photo);
 
         var predictions = await _predictionsGetter
-            .GetPredictions(hostedPhoto.Uri, modelsList);
+            .GetPredictions("https://dm0qx8t0i9gc9.cloudfront.net/thumbnails/video/V1xq1AADx/videoblocks-group-of-business-people-meeting-around-table-20s-4k_sncaqskgw_thumbnail-1080_01.png", modelsList);
 
         FileUtils.DeleteFile(hostedPhoto.Path);
 
