@@ -27,7 +27,7 @@ builder.Configuration.AddEnvironmentVariables();
 builder.Services.Configure<UrlsConfig>(builder.Configuration.GetSection("Urls"));
 builder.Services.Configure<ApiConfig>(builder.Configuration.GetSection("Apis"));
 builder.Services.Configure<PhotosConfig>(builder.Configuration.GetSection("Photos"));
-builder.Services.Configure<List<YoloRunnerConfig>>(builder.Configuration.GetSection("YoloRunners"));
+builder.Services.Configure<List<ModelRunnerConfig>>(builder.Configuration.GetSection("ModelRunners"));
 
 var loggingConfig = new LoggingConfig();
 builder.Services.AddSingleton(loggingConfig);

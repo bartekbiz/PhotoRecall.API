@@ -5,13 +5,13 @@ using Microsoft.Extensions.Options;
 
 namespace PhotoRecall.API.Info;
 
-public class InfoService(IOptions<List<YoloRunnerConfig>> yoloRunnersConfig) : IInfoService
+public class InfoService(IOptions<List<ModelRunnerConfig>> yoloRunnersConfig) : IInfoService
 {
-    private readonly List<YoloRunnerConfig> _yoloRunnersConfig = yoloRunnersConfig.Value;
+    private readonly List<ModelRunnerConfig> _modelRunnersConfig = yoloRunnersConfig.Value;
 
     public List<string> GetAvailableYoloModels()
     {
-        return _yoloRunnersConfig.SelectMany(s => s.Models).ToList();
+        return _modelRunnersConfig.SelectMany(s => s.Models).ToList();
     }
 
     public List<YoloClassDto> GetAllYoloClasses()

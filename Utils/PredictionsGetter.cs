@@ -7,13 +7,13 @@ using Newtonsoft.Json;
 
 namespace Utils;
 
-public class PredictionsGetter(ILogger logger, List<YoloRunnerConfig> yoloRunnersConfig)
+public class PredictionsGetter(ILogger logger, List<ModelRunnerConfig> yoloRunnersConfig)
 {
     private readonly HttpClient _client = new HttpClient();
 
-    public async Task<List<YoloRunResultDto>> GetPredictions(string photoUrl, List<string> yoloModels)
+    public async Task<List<ModelRunResultDto>> GetPredictions(string photoUrl, List<string> yoloModels)
     {
-        var result = new List<YoloRunResultDto>();
+        var result = new List<ModelRunResultDto>();
         
         await Parallel.ForEachAsync(yoloRunnersConfig, async (yoloRunner, cancellationToken) =>
         {
@@ -28,12 +28,12 @@ public class PredictionsGetter(ILogger logger, List<YoloRunnerConfig> yoloRunner
 
                     var requestResult = await RequestYoloRunner(url, photoUrl, model, token);
                     
-                    var yoloRunnerResult = new YoloRunResultDto()
+                    var yoloRunnerResult = new ModelRunResultDto()
                     {
-                        YoloRunInfo = new YoloRunInfoDto()
+                        ModelRunInfo = new ModelRunInfoDto()
                         {
-                            YoloRunnerName = yoloRunner.Name,
-                            YoloRunnerUrl = url,
+                            ModelRunnerName = yoloRunner.Name,
+                            ModelRunnerUrl = url,
                             Model = model
                         },
                         Predictions = requestResult,

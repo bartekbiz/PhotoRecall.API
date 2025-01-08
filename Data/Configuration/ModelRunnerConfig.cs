@@ -1,6 +1,6 @@
 namespace Data;
 
-public class YoloRunnerConfig
+public class ModelRunnerConfig
 {
     public string Name { get; set; }
     public List<string> Urls { get; set; }
