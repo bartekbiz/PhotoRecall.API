@@ -22,6 +22,6 @@ public class BoxDto
 
 public class PredictionDtoMerged : PredictionDtoBase
 {
-    public int Count { get; set; }
+    public int? Count { get; set; }
 }
 
