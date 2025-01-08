@@ -101,7 +101,7 @@ public class PredictionsService : IPredictionsService
             .SaveAndHostFile(_photosConfig.Path, _urlsConfig.ContainerUrl, photo);
 
         var predictions = await _predictionsGetter
-            .GetPredictions("https://dm0qx8t0i9gc9.cloudfront.net/thumbnails/video/V1xq1AADx/videoblocks-group-of-business-people-meeting-around-table-20s-4k_sncaqskgw_thumbnail-1080_01.png", modelsList);
+            .GetPredictions(hostedPhoto.Uri, modelsList);
 
         FileUtils.DeleteFile(hostedPhoto.Path);
 
