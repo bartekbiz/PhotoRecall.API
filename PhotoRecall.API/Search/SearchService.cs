@@ -1,8 +1,6 @@
-using Data;
 using Data.Configuration;
 using Data.Enums;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using Utils;
 
 namespace PhotoRecall.API.Search;
@@ -16,9 +14,9 @@ public class SearchService : ISearchService
         _apisConfig = apisConfig.Value;
     }
     
-    public async Task<List<YoloClassEnum>> GetYoloClassesAsync(string phrase)
+    public async Task<List<DetectionClassEnum>> GetDetectionClassesAsync(string phrase)
     {
-        var yoloClassSearcher = new YoloClassSearcher(_apisConfig.Synonyms);
+        var yoloClassSearcher = new DetectionClassSearcher(_apisConfig.Synonyms);
 
         return await yoloClassSearcher.Search(phrase);
     }

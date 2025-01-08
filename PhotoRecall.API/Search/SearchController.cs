@@ -7,10 +7,10 @@ namespace PhotoRecall.API.Search;
 public class SearchController(ISearchService searchService) : ControllerBase
 {
     [HttpGet]
-    [Route("GetYoloClassesAsync")]
-    public async Task<IActionResult> GetYoloClassesAsync(string phrase)
+    [Route("GetDetectionClassesAsync")]
+    public async Task<IActionResult> GetDetectionClassesAsync(string phrase)
     {
-        var classes = await searchService.GetYoloClassesAsync(phrase);
+        var classes = await searchService.GetDetectionClassesAsync(phrase);
         
         return StatusCode(StatusCodes.Status200OK, classes);
     }

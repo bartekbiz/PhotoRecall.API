@@ -4,5 +4,5 @@ namespace PhotoRecall.API.Search;
 
 public interface ISearchService
 {
-    Task<List<YoloClassEnum>> GetYoloClassesAsync(string phrase);
+    Task<List<DetectionClassEnum>> GetDetectionClassesAsync(string phrase);
 }
