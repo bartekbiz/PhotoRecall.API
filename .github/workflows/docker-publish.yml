@@ -1,4 +1,4 @@
-name: build-and-push-photorecall-api
+name: docker-publish
 
 on:
   push:
