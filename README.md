@@ -1,3 +1,4 @@
+[![build-and-test](https://github.com/bartekbiz/PhotoRecall.API/actions/workflows/dotnet.yml/badge.svg)](https://github.com/bartekbiz/PhotoRecall.API/actions/workflows/dotnet.yml)
 [![build-and-push-photorecall-api](https://github.com/bartekbiz/PhotoRecall.API/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/bartekbiz/PhotoRecall.API/actions/workflows/docker-publish.yml)
 [![build-and-push-photorecall-api-dev](https://github.com/bartekbiz/PhotoRecall.API/actions/workflows/docker-publish-dev.yml/badge.svg)](https://github.com/bartekbiz/PhotoRecall.API/actions/workflows/docker-publish-dev.yml)
 
