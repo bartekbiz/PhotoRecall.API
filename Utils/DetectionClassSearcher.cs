@@ -23,7 +23,7 @@ public class DetectionClassSearcher
         
         foreach (var phrase in phrasesToCheck)
         {
-            var map = MapPhraseToClass(phrase);
+            var map = OtherUtils.TryMapPhraseToDetectionClass(phrase);
             if (map == null) continue;
             
             result.Add(map.Value);
@@ -51,17 +51,5 @@ public class DetectionClassSearcher
         
         var result = JsonConvert.DeserializeObject<SynonymsApiDto>(await response.Content.ReadAsStringAsync());
         return result?.Synonyms ?? [];
-    }
-    
-    private DetectionClassEnum? MapPhraseToClass(string phrase)
-    {
-        phrase = phrase.Trim().Replace(" ", "").ToLower();
-        
-        if (Enum.TryParse(phrase, ignoreCase: true, out DetectionClassEnum yoloClass))
-        {
-            return yoloClass;
-        }
-        
-        return null;
     }
 }

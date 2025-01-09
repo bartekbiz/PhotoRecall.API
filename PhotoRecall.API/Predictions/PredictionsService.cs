@@ -161,7 +161,7 @@ public class PredictionsService : IPredictionsService
     {
         var modelsListProps = string.IsNullOrEmpty(propsDto.YoloModels) ?
             null : 
-            OtherUtils.ConvertJsonStringToList(propsDto.YoloModels);
+            OtherUtils.TryConvertJsonStringToList(propsDto.YoloModels);
 
         return modelsListProps ?? _infoService.GetAvailableYoloModels();
     }
