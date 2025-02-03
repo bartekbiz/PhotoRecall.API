@@ -7,7 +7,7 @@ namespace PhotoRecall.API.Info;
 public class InfoController(IInfoService infoService) : ControllerBase
 {
     [HttpGet]
-    [Route("GetAvailableYoloModels")]
+    [Route("available-models")]
     public IActionResult GetAvailableYoloModels()
     {
         var yoloModels = infoService.GetAvailableYoloModels();
@@ -16,7 +16,7 @@ public class InfoController(IInfoService infoService) : ControllerBase
     }
     
     [HttpGet]
-    [Route("GetAllDetectionClasses")]
+    [Route("detection-classes")]
     public IActionResult GetAllDetectionClasses()
     {
         var yoloClasses = infoService.GetAllDetectionClasses();

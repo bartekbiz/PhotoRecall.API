@@ -1,10 +1,7 @@
 using Data;
 using Data.Configuration;
-using Data.Enums;
-using Newtonsoft.Json;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Logs;
-using PhotoRecall.API.Administration;
 using PhotoRecall.API.Info;
 using PhotoRecall.API.Middleware;
 using PhotoRecall.API.Predictions;
@@ -59,10 +56,11 @@ builder.Services.AddScoped<ErrorHandlingMiddleware>();
 builder.Services.AddScoped<IPredictionsService, PredictionsService>();
 builder.Services.AddScoped<IInfoService, InfoService>();
 builder.Services.AddScoped<ISearchService, SearchService>();
-builder.Services.AddScoped<IAdministratorService, AdministratorService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 #endregion
 
 var app = builder.Build();
