@@ -7,7 +7,7 @@ namespace PhotoRecall.API.Search;
 public class SearchController(ISearchService searchService) : ControllerBase
 {
     [HttpGet]
-    [Route("GetDetectionClassesAsync")]
+    [Route("detection-classes")]
     public async Task<IActionResult> GetDetectionClassesAsync(string phrase)
     {
         var classes = await searchService.GetDetectionClassesAsync(phrase);
