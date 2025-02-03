@@ -5,8 +5,7 @@ namespace PhotoRecall.API.Predictions;
 
 public interface IPredictionsService
 {
-    Task<List<ModelRunResultDto>> GetAllPredictionsAsync(IFormFile photo);
     Task<List<ModelRunResultDto>> GetPredictionsAsync(PredictionPropsDto propsDto);
-    Task<List<PredictionDtoMerged>> GetVotedPredictionsWithCountAsync(PredictionPropsDto propsDto);
-    Task<List<PredictionDtoMerged>> GetPredictionsAllDetectedAsync(PredictionPropsDto propsDto);
+    Task<List<PredictionDtoMerged>> GetMergedPredictionsAsync(PredictionVotingPropsDto propsDto);
+    Task<List<PredictionDtoMerged>> GetMergedPredictionsWithCountsAsync(PredictionPropsDto propsDto);
 }

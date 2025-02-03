@@ -34,30 +34,30 @@ public class PredictionsService : IPredictionsService
         _mergingContext = new MergingContext();
     }
     
-    #region GetMergedPredictions
+    #region Get and Merge predictions
    
-    public async Task<List<PredictionDtoMerged>> GetPredictionsAllDetectedAsync(PredictionPropsDto propsDto)
+    public async Task<List<PredictionDtoMerged>> GetMergedPredictionsAsync(PredictionVotingPropsDto propsDto)
     {
         var modelCount = GetModelsList(propsDto).Count;
         var threshold = (propsDto.AgreeRatio / 100) * modelCount;
 
         var mergeStrategy = new MergeStrategyAllDetected();
-        return await GetMergedPredictions(mergeStrategy, propsDto, threshold);
+        return await GetMergedPredictionsAsync(mergeStrategy, propsDto, threshold);
     }
     
-    public async Task<List<PredictionDtoMerged>> GetVotedPredictionsWithCountAsync(PredictionPropsDto propsDto)
+    public async Task<List<PredictionDtoMerged>> GetMergedPredictionsWithCountsAsync(PredictionPropsDto propsDto)
     {
         var mergeStrategy = new MergeStrategyWithCounts();
-        return await GetMergedPredictions(mergeStrategy, propsDto);
+        return await GetMergedPredictionsAsync(mergeStrategy, propsDto);
     }
 
-    private async Task<List<PredictionDtoMerged>> GetMergedPredictions(
+    private async Task<List<PredictionDtoMerged>> GetMergedPredictionsAsync(
         IMergeStrategy strategy, PredictionPropsDto propsDto)
     {
-        return await GetMergedPredictions(strategy, propsDto, new object());
+        return await GetMergedPredictionsAsync(strategy, propsDto, new object());
     }
     
-    private async Task<List<PredictionDtoMerged>> GetMergedPredictions( 
+    private async Task<List<PredictionDtoMerged>> GetMergedPredictionsAsync( 
         IMergeStrategy strategy, PredictionPropsDto propsDto, object args)
     {
         var predictions = await GetPredictionsAsync(propsDto);
@@ -76,15 +76,7 @@ public class PredictionsService : IPredictionsService
     
     #endregion
     
-    #region GetPredictions
-    
-    public async Task<List<ModelRunResultDto>> GetAllPredictionsAsync(IFormFile photo)
-    {
-        var modelsList = _infoService.GetAvailableYoloModels();
-        ValidatePhoto(photo);
-        
-        return await GetPredictionsAsync(photo, modelsList);
-    }
+    #region Get predictions
     
     public async Task<List<ModelRunResultDto>> GetPredictionsAsync(PredictionPropsDto propsDto)
     {
@@ -92,7 +84,7 @@ public class PredictionsService : IPredictionsService
         
         ValidateProps(propsDto.Photo, modelsList);
 
-        return await GetPredictionsAsync(propsDto.Photo, modelsList!);
+        return await GetPredictionsAsync(propsDto.Photo, modelsList);
     }
 
     private async Task<List<ModelRunResultDto>> GetPredictionsAsync(IFormFile photo, List<string> modelsList)
@@ -159,9 +151,10 @@ public class PredictionsService : IPredictionsService
     
     private List<string> GetModelsList(PredictionPropsDto propsDto)
     {
-        var modelsListProps = string.IsNullOrEmpty(propsDto.YoloModels) ?
-            null : 
-            OtherUtils.TryConvertJsonStringToList(propsDto.YoloModels);
+        var modelsListProps = string.IsNullOrEmpty(propsDto.Models) ? 
+            null
+            : 
+            OtherUtils.TryConvertJsonStringToList(propsDto.Models);
 
         return modelsListProps ?? _infoService.GetAvailableYoloModels();
     }

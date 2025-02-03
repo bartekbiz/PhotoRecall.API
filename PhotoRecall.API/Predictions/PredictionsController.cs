@@ -9,16 +9,7 @@ namespace PhotoRecall.API.Predictions;
 public class PredictionsController(IPredictionsService predictionsService) : ControllerBase
 {
     [HttpPost]
-    [Route("GetAllPredictionsAsync")]
-    public async Task<IActionResult> GetAllPredictionsAsync(IFormFile photo)
-    {
-        var yoloRunnerResults = await predictionsService.GetAllPredictionsAsync(photo);
-        
-        return StatusCode(StatusCodes.Status200OK, yoloRunnerResults);
-    }
-    
-    [HttpPost]
-    [Route("GetPredictionsAsync")]
+    [Route("unmerged")]
     public async Task<IActionResult> GetPredictionsAsync(PredictionPropsDto propsDto)
     {
         var predictions = await predictionsService
@@ -28,21 +19,21 @@ public class PredictionsController(IPredictionsService predictionsService) : Con
     }
     
     [HttpPost]
-    [Route("GetVotedPredictionsWithCountAsync")]
-    public async Task<IActionResult> GetVotedPredictionsWithCountAsync(PredictionPropsDto propsDto)
+    [Route("merged")]
+    public async Task<IActionResult> GetMergedPredictionsAsync(PredictionVotingPropsDto propsDto)
     {
         var predictions = await predictionsService
-            .GetVotedPredictionsWithCountAsync(propsDto);
+            .GetMergedPredictionsAsync(propsDto);
         
         return StatusCode(StatusCodes.Status200OK, predictions);
     }
     
     [HttpPost]
-    [Route("GetPredictionsAllDetectedAsync")]
-    public async Task<IActionResult> GetPredictionsAllDetectedAsync(PredictionPropsDto propsDto)
+    [Route("merged-with-counts")]
+    public async Task<IActionResult> GetMergedPredictionsWithCountsAsync(PredictionPropsDto propsDto)
     {
         var predictions = await predictionsService
-            .GetPredictionsAllDetectedAsync(propsDto);
+            .GetMergedPredictionsWithCountsAsync(propsDto);
         
         return StatusCode(StatusCodes.Status200OK, predictions);
     }
